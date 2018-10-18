@@ -57,14 +57,18 @@ class XceptionPreprocess:
         """
 
         def resize_img(img, size):
-            img_croped = img.crop(
-                (
-                    -((size - img.size[0]) / 2),
-                    -((size - img.size[1]) / 2),
-                    img.size[0] + (size - img.size[0]) / 2,
-                    img.size[1] + (size - img.size[1]) / 2
-                )
-            )
+
+# pad zero with short side
+            # img_croped = img.crop(
+            #     (
+            #         -((size - img.size[0]) / 2),
+            #         -((size - img.size[1]) / 2),
+            #         img.size[0] + (size - img.size[0]) / 2,
+            #         img.size[1] + (size - img.size[1]) / 2
+            #     )
+            # )
+# now, yolo output is square, only need resize
+
             img_resized = img_croped.resize((size, size))
             return img_resized
 
