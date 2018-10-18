@@ -50,23 +50,20 @@ class PCK:
                 for key, lst in tiff_dict.items():
                     o.write('%s\t%s\n' % (key, '|'.join(lst)))
 
-        keys = list(tiff_dict.keys())
-        for key in keys[:1]:
-            print(tiff_dict[key])
+        # Yolo 初始化
+        model = DarknetPredict()
 
-        # # Yolo 初始化
-        # model = DarknetPredict()
-        #
-        # # 遍历切割细胞，识别细胞分类
-        # for tiff_name, images_lst in tiff_dict.items():
-        #     # 执行 Yolo 细胞分割
-        #     seg_results = model.predict(images_lst)
-        #
-        #     # 将细胞分割结果写入文件
-        #     xcep_pre = XceptionPreprocess(tiff_name)
-        #     seg_csv = os.path.join(self.meta_files_path, tiff_name + "_seg.csv")
-        #     xcep_pre.write_csv(seg_results, seg_csv)
-        #
+        # 遍历切割细胞，识别细胞分类
+        for tiff_name in list(tiff_dict.keys())[:2]:
+            images_lst = tiff_dict[tiff_name]
+            # 执行 Yolo 细胞分割
+            seg_results = model.predict(images_lst)
+
+            # 将细胞分割结果写入文件
+            xcep_pre = XceptionPreprocess(tiff_name)
+            seg_csv = os.path.join(self.meta_files_path, tiff_name + "_seg.csv")
+            xcep_pre.write_csv(seg_results, seg_csv)
+
         #     # generate numpy array, it is the input of second stage classification algorithm
         #     cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
         #
