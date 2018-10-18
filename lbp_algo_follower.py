@@ -53,8 +53,13 @@ class PCK:
         # Yolo 初始化
         model = DarknetPredict()
 
+        keys = list(tiff_dict.keys())
+        total = len(keys)
+
         # 遍历切割细胞，识别细胞分类
-        for tiff_name in list(tiff_dict.keys())[:2]:
+        for index, tiff_name in enumerate(keys[:2]):
+            print('Process %s / %s %s ...' % (index + 1, total, tiff_name))
+
             images_lst = tiff_dict[tiff_name]
             # 执行 Yolo 细胞分割
             seg_results = model.predict(images_lst)
@@ -64,19 +69,19 @@ class PCK:
             seg_csv = os.path.join(self.meta_files_path, tiff_name + "_seg.csv")
             xcep_pre.write_csv(seg_results, seg_csv)
 
-        #     # generate numpy array, it is the input of second stage classification algorithm
-        #     cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
-        #
-        #     # 执行细胞分类
-        #     predictions = XceptionPredict().predict(cell_numpy)
-        #
-        #     # summarize two stages' result and generate a final csv
-        #     clas = XceptionPostprocess()
-        #     clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-        #     clas_csv = os.path.join(self.meta_files_path, tiff_name + "_clas.csv")
-        #     clas.write_csv(clas_dict, clas_csv)
-        #
-        #     clas.cut_cells_p_marked(tiff_name, clas_dict, self.cell_path, factor=0.2, N=2)
+            # generate numpy array, it is the input of second stage classification algorithm
+            cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
+
+            # 执行细胞分类
+            predictions = XceptionPredict().predict(cell_numpy)
+
+            # summarize two stages' result and generate a final csv
+            clas = XceptionPostprocess()
+            clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
+            clas_csv = os.path.join(self.meta_files_path, tiff_name + "_clas.csv")
+            clas.write_csv(clas_dict, clas_csv)
+
+            # clas.cut_cells_p_marked(tiff_name, clas_dict, self.cell_path, factor=0.2, N=2)
 
 
 if __name__ == "__main__":

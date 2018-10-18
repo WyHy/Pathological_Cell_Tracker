@@ -4,6 +4,7 @@ import numpy as np
 import openslide
 from common.tslide.tslide import TSlide
 from config.config import cfg
+import re
 
 
 class XceptionPreprocess:
@@ -12,6 +13,7 @@ class XceptionPreprocess:
             input_file: input .kfb/.tif full path name
         """
         self.input_file = input_file
+        self.pattern = re.compile(r'(.*?)_(\d+)_(\d+).jpg')
 
     def write_csv(self, results, csv_fullname):
         """
@@ -58,7 +60,7 @@ class XceptionPreprocess:
 
         def resize_img(img, size):
 
-# pad zero with short side
+            # pad zero with short side
             # img_croped = img.crop(
             #     (
             #         -((size - img.size[0]) / 2),
@@ -67,15 +69,16 @@ class XceptionPreprocess:
             #         img.size[1] + (size - img.size[1]) / 2
             #     )
             # )
-# now, yolo output is square, only need resize
+            # now, yolo output is square, only need resize
 
-            img_resized = img_croped.resize((size, size))
+            img_resized = img.resize((size, size))
             return img_resized
 
         try:
             slide = openslide.OpenSlide(self.input_file)
         except:
             slide = TSlide(self.input_file)
+
         cell_list = []
         cell_index = {}
         index = 0
@@ -109,3 +112,35 @@ class XceptionPreprocess:
 
         seg_dict = self.read_csv(seg_csv)
         return self.gen_np_array_mem(results=seg_dict, classes=classes, det=det, size=size)
+
+    def gen_np_array_mem_(self, results, classes=cfg.darknet.classes, det=cfg.xception.det1, size=cfg.xception.size):
+        def resize_img(img, size):
+            img_resized = img.resize((size, size))
+            return img_resized
+
+        try:
+            slide = openslide.OpenSlide(self.input_file)
+        except:
+            slide = TSlide(self.input_file)
+
+        cell_list = []
+        cell_index = {}
+        index = 0
+        for x_y, boxes in results.items():
+            for box in boxes:
+                if box[0] in classes and box[1] > det:
+                    _, x, y = re.findall(self.pattern, x_y)[0]
+                    x = int(x) + int(box[2][0])
+                    y = int(y) + int(box[2][1])
+                    w = int(box[2][2])
+                    h = int(box[2][3])
+                    cell = slide.read_region((x, y), 0, (w, h)).convert("RGB")
+                    cell_list.append(np.array(resize_img(cell, size)))
+                    cell_index[index] = [x_y, list(box)]
+                    index += 1
+        slide.close()
+        return np.asarray(cell_list), cell_index
+
+    def gen_np_array_csv_(self, seg_csv, classes=cfg.darknet.classes, det=cfg.xception.det1, size=cfg.xception.size):
+        seg_dict = self.read_csv(seg_csv)
+        return self.gen_np_array_mem_(results=seg_dict, classes=classes, det=det, size=size)
