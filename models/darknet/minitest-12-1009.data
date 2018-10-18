@@ -1,0 +1,4 @@
+classes= 12
+train  = train.txt
+names = /home/tsimage/Documents/lbp-algo/models/darknet/minitest-12.names
+backup = backup
