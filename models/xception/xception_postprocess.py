@@ -6,6 +6,8 @@ import xml.dom.minidom
 from shapely import geometry
 from config.config import cfg
 from common.tslide.tslide import TSlide
+from utils import get_tiff_dict
+
 
 class XceptionPostprocess:
 
@@ -196,7 +198,6 @@ class XceptionPostprocess:
                 w = int(box[4][2])
                 h = int(box[4][3])
 
-                
                 marked_class_i = is_overlapped(marked_boxes, (x,y,w,h), factor)
                 if marked_class_i:
                     image_name = "1-p{:.4f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1-box[3], marked_class_i, basename, x, y, w, h, N)
@@ -207,5 +208,79 @@ class XceptionPostprocess:
                 os.makedirs(save_path_i, exist_ok=True)
                 image_fullname = os.path.join(save_path_i, image_name)
                 slide.read_region((int(x+(1-N)*w/2), int(y+(1-N)*h/2)), 0, (int(N*w), int(N*h))).convert("RGB").save(image_fullname)
+
+        slide.close()
+
+    def cut_cells_p_marked_(self, tifname, new_dict, save_path, factor=0.3, N=4):
+        def get_labels(xmlname):
+            if not os.path.isfile(xmlname):
+                return []
+            classes = {"#aa0000": "HSIL", "#aa007f": "ASCH", "#005500": "LSIL", "#00557f": "ASCUS",
+                       "#0055ff": "SCC", "#aa557f": "ADC", "#aa55ff": "EC", "#ff5500": "AGC1",
+                       "#ff557f": "AGC2", "#ff55ff": "AGC3", "#00aa00": "FUNGI", "#00aa7f": "TRI",
+                       "#00aaff": "CC", "#55aa00": "ACTINO", "#55aa7f": "VIRUS", "#ffffff": "NORMAL",
+                       "#000000": "MC", "#aa00ff": "SC", "#ff0000": "RC", "#aa5500": "GEC"}
+            DOMTree = xml.dom.minidom.parse(xmlname)
+            collection = DOMTree.documentElement
+            annotations = collection.getElementsByTagName("Annotation")
+            marked_boxes = []
+            for annotation in annotations:
+                colorCode = annotation.getAttribute("Color")
+                if not colorCode in classes:
+                    continue
+                marked_box = [classes[colorCode], []]
+                coordinates = annotation.getElementsByTagName("Coordinate")
+                marked_box[1] = [(float(coordinate.getAttribute('X')), float(coordinate.getAttribute('Y'))) for
+                                 coordinate in coordinates]
+                marked_boxes.append(marked_box)
+            return marked_boxes
+
+        def is_overlapped(marked_boxes, predicted_box, factor):
+            for marked_box in marked_boxes:
+                marked_box_obj = geometry.Polygon(marked_box[1])
+                predicted_box_obj = geometry.box(predicted_box[0],
+                                                 predicted_box[1],
+                                                 predicted_box[0] + predicted_box[2],
+                                                 predicted_box[1] + predicted_box[3])
+                if marked_box_obj.intersection(predicted_box_obj).area / (
+                        marked_box_obj.area + predicted_box_obj.area - marked_box_obj.intersection(
+                        predicted_box_obj).area) >= factor:
+                    return marked_box[0]
+            return ""
+
+        tiff_dict = get_tiff_dict()
+        if tifname not in tiff_dict:
+            raise Exception("XCEPTION POSTPROCESS %s NOT FOUND" % tifname)
+
+        try:
+            slide = openslide.OpenSlide(tiff_dict[tifname])
+        except:
+            slide = TSlide(tifname)
+
+        basename = os.path.splitext(os.path.basename(tifname))[0]
+        parent_d = os.path.basename(os.path.dirname(tifname))
+        save_path = os.path.join(save_path, parent_d, basename)
+        marked_boxes = get_labels(os.path.splitext(tifname)[0] + ".xml")
+        for x_y, boxes in new_dict.items():
+            for box in boxes:
+                # image naming: tifname_x_y_w_h_p.jpg
+                x = int(x_y.split('_')[0]) + int(box[4][0])
+                y = int(x_y.split('_')[1]) + int(box[4][1])
+                w = int(box[4][2])
+                h = int(box[4][3])
+
+                marked_class_i = is_overlapped(marked_boxes, (x, y, w, h), factor)
+                if marked_class_i:
+                    image_name = "1-p{:.4f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3],
+                                                                                           marked_class_i, basename,
+                                                                                           x, y, w, h, N)
+                    save_path_i = os.path.join(save_path, box[2], "marked")
+                else:
+                    image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
+                    save_path_i = os.path.join(save_path, box[2])
+                os.makedirs(save_path_i, exist_ok=True)
+                image_fullname = os.path.join(save_path_i, image_name)
+                slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,
+                                  (int(N * w), int(N * h))).convert("RGB").save(image_fullname)
 
         slide.close()

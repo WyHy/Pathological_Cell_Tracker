@@ -6,6 +6,8 @@ from common.tslide.tslide import TSlide
 from config.config import cfg
 import re
 
+from utils import get_tiff_dict
+
 
 class XceptionPreprocess:
     def __init__(self, input_file):
@@ -118,10 +120,17 @@ class XceptionPreprocess:
             img_resized = img.resize((size, size))
             return img_resized
 
+        tiff_dict = get_tiff_dict()
+        if self.input_file not in tiff_dict:
+            raise Exception("XCEPTION PREPROCESS %s NOT FOUND" % self.input_file)
+
         try:
-            slide = openslide.OpenSlide(self.input_file)
+            try:
+                slide = openslide.OpenSlide(self.input_file)
+            except:
+                slide = TSlide(self.input_file)
         except:
-            slide = TSlide(self.input_file)
+            raise Exception('TIFF FILE OPEN FAILED => %s' % self.input_file)
 
         cell_list = []
         cell_index = {}

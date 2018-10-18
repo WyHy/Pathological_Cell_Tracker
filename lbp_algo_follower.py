@@ -31,12 +31,14 @@ class PCK:
         # 大图对应大图所属608文件路径列表字典
         tiff_dict = {}
         if os.path.exists(dict_file):
+            print("LOADING <TIFF_NAME>: <IMAGE_PATH_LIST> DICT ...")
             with open(dict_file) as f:
                 lines = f.readlines()
                 for line in lines:
                     key, lst = line.replace('\n', '').split('\t')
                     tiff_dict[key] = lst.split('|')
         else:
+            print("GENERATE <TIFF_NAME>: <IMAGE_PATH_LIST> DICT ...")
             for item in images_lst:
                 basename = os.path.basename(item)
                 tiff_name, x, y = re.findall(pattern, basename)[0]
@@ -81,7 +83,7 @@ class PCK:
             clas_csv = os.path.join(self.meta_files_path, tiff_name + "_clas.csv")
             clas.write_csv(clas_dict, clas_csv)
 
-            # clas.cut_cells_p_marked(tiff_name, clas_dict, self.cell_path, factor=0.2, N=2)
+            clas.cut_cells_p_marked_(tiff_name, clas_dict, self.cell_path, factor=0.2, N=2)
 
 
 if __name__ == "__main__":
