@@ -1,0 +1,5 @@
+train = train.txt
+backup = backup
+classes = 5
+valid = valid.txt
+names = /home/sakulaki/yolo-yuli/lbp-algo/models/darknet/minitest.names
