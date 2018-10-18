@@ -50,7 +50,10 @@ class PCK:
                 for key, lst in tiff_dict.items():
                     o.write('%s\t%s\n' % (key, '|'.join(lst)))
 
-        print(dict_file)
+        keys = list(tiff_dict.keys())
+        for key in keys[:1]:
+            print(tiff_dict[key])
+
         # # Yolo 初始化
         # model = DarknetPredict()
         #
