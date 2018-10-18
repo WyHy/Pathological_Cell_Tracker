@@ -15,7 +15,7 @@ class XceptionPreprocess:
             input_file: input .kfb/.tif full path name
         """
         self.input_file = input_file
-        self.pattern = re.compile(r'(.*?)_(\d+)_(\d+).jpg')
+        self.pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
     def write_csv(self, results, csv_fullname):
         """
@@ -126,9 +126,9 @@ class XceptionPreprocess:
 
         try:
             try:
-                slide = openslide.OpenSlide(self.input_file)
+                slide = openslide.OpenSlide(tiff_dict[self.input_file])
             except:
-                slide = TSlide(self.input_file)
+                slide = TSlide(tiff_dict[self.input_file])
         except:
             raise Exception('TIFF FILE OPEN FAILED => %s' % self.input_file)
 
@@ -138,12 +138,20 @@ class XceptionPreprocess:
         for x_y, boxes in results.items():
             for box in boxes:
                 if box[0] in classes and box[1] > det:
+                    # print(x_y)
                     _, x, y = re.findall(self.pattern, x_y)[0]
+                    # print("1=> %s, %s" % (x, y))
                     x = int(x) + int(box[2][0])
                     y = int(y) + int(box[2][1])
                     w = int(box[2][2])
                     h = int(box[2][3])
+                    # print("2=> %s, %s" % (x, y))
+
+
                     cell = slide.read_region((x, y), 0, (w, h)).convert("RGB")
+                    # image_name = "%s_%s_%s_%s.jpg" % (x, y, w, h)
+                    # cell.save(os.path.join('/home/tsimage/Development/DATA/middle_cells', image_name))
+
                     cell_list.append(np.array(resize_img(cell, size)))
                     cell_index[index] = [x_y, list(box)]
                     index += 1

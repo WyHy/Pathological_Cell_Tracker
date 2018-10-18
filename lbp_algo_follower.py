@@ -58,32 +58,45 @@ class PCK:
         keys = list(tiff_dict.keys())
         total = len(keys)
 
+        failed_tiff_lst = []
+
         # 遍历切割细胞，识别细胞分类
-        for index, tiff_name in enumerate(keys[:2]):
+        for index, tiff_name in enumerate(keys):
             print('Process %s / %s %s ...' % (index + 1, total, tiff_name))
 
-            images_lst = tiff_dict[tiff_name]
-            # 执行 Yolo 细胞分割
-            seg_results = model.predict(images_lst)
+            try:
 
-            # 将细胞分割结果写入文件
-            xcep_pre = XceptionPreprocess(tiff_name)
-            seg_csv = os.path.join(self.meta_files_path, tiff_name + "_seg.csv")
-            xcep_pre.write_csv(seg_results, seg_csv)
+                images_lst = tiff_dict[tiff_name]
+                # 执行 Yolo 细胞分割
+                seg_results = model.predict(images_lst)
 
-            # generate numpy array, it is the input of second stage classification algorithm
-            cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
+                # 将细胞分割结果写入文件
+                xcep_pre = XceptionPreprocess(tiff_name)
+                seg_csv = os.path.join(self.meta_files_path, tiff_name + "_seg.csv")
+                xcep_pre.write_csv(seg_results, seg_csv)
 
-            # 执行细胞分类
-            predictions = XceptionPredict().predict(cell_numpy)
+                # generate numpy array, it is the input of second stage classification algorithm
+                cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
 
-            # summarize two stages' result and generate a final csv
-            clas = XceptionPostprocess()
-            clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-            clas_csv = os.path.join(self.meta_files_path, tiff_name + "_clas.csv")
-            clas.write_csv(clas_dict, clas_csv)
+                # 执行细胞分类
+                predictions = XceptionPredict().predict(cell_numpy)
 
-            clas.cut_cells_p_marked_(tiff_name, clas_dict, self.cell_path, factor=0.2, N=2)
+                # summarize two stages' result and generate a final csv
+                clas = XceptionPostprocess()
+                clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
+                clas_csv = os.path.join(self.meta_files_path, tiff_name + "_clas.csv")
+                clas.write_csv(clas_dict, clas_csv)
+
+                clas.cut_cells_p_marked_(tiff_name, clas_dict, self.cells_path, factor=0.2, N=2)
+            except Exception as e:
+                print(str(e))
+                failed_tiff_lst.append((tiff_name, str(e)))
+
+                continue
+
+        with open("failed_tiff_lst.txt", 'w') as o:
+            for ele in failed_tiff_lst:
+                o.write("%s\n" % '\t'.join(ele))
 
 
 if __name__ == "__main__":

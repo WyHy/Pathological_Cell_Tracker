@@ -7,7 +7,9 @@ from shapely import geometry
 from config.config import cfg
 from common.tslide.tslide import TSlide
 from utils import get_tiff_dict
+import re
 
+pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
 class XceptionPostprocess:
 
@@ -255,7 +257,7 @@ class XceptionPostprocess:
         try:
             slide = openslide.OpenSlide(tiff_dict[tifname])
         except:
-            slide = TSlide(tifname)
+            slide = TSlide(tiff_dict[tifname])
 
         basename = os.path.splitext(os.path.basename(tifname))[0]
         parent_d = os.path.basename(os.path.dirname(tifname))
@@ -264,8 +266,9 @@ class XceptionPostprocess:
         for x_y, boxes in new_dict.items():
             for box in boxes:
                 # image naming: tifname_x_y_w_h_p.jpg
-                x = int(x_y.split('_')[0]) + int(box[4][0])
-                y = int(x_y.split('_')[1]) + int(box[4][1])
+                _, x, y = re.findall(pattern, x_y)[0]
+                x = int(x) + int(box[4][0])
+                y = int(y) + int(box[4][1])
                 w = int(box[4][2])
                 h = int(box[4][3])
 
