@@ -149,8 +149,9 @@ def rm_duplicate_point(point_lst):
     for point in point_lst:
         label, accuracy, center_x, center_y, w, h = point[0], point[1], point[2][0], point[2][1], point[2][2], point[2][3]
         x, y = center_x - (w / 2), center_y - (h / 2)
+        point_ = (x, y, w, h)
+        
         for item in pure_lst:
-            point_ = (x, y, w, h)
             if cal_IOU(item, point_) > 0.5:
                 break
         else:

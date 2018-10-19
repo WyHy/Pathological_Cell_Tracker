@@ -1,6 +1,6 @@
 from models.darknet.darknet import *
 from config.config import cfg
-from utils import rm_duplicate_point
+from utils import rm_duplicate_point, cal_IOU
 
 
 class DarknetPredict:
@@ -52,12 +52,25 @@ class DarknetPredict:
             #   results.append(detect_with_rawdata(self.net, self.meta, image, self.thresh, self.hier_thresh, self.nms))
             results[os.path.splitext(os.path.basename(image))[0]] = detect(self.net, self.meta, image, self.thresh,
                                                                            self.hier_thresh, self.nms)
+
+        unique_point_collection = []
         results_new = {}
         for x_y, boxes in results.items():
             if len(boxes) == 0:
                 continue
 
             # 坐标去重处理
-            results_new[x_y] = rm_duplicate_point(boxes)
+            results_new[x_y] = []
+
+            points = rm_duplicate_point(boxes)
+            # point = (label, accuracy, (x, y, w, h))
+            for point in points:
+                for item in unique_point_collection:
+                    if cal_IOU(item, point[2]) > 0.5:
+                        break
+                else:
+                    unique_point_collection.append(point[2])
+                    results_new[x_y].append(point)
+
 
         return results_new

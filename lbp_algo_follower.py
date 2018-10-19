@@ -9,6 +9,8 @@ from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
 
+import datetime
+
 
 class PCK:
     def __init__(self, images_path, meta_files_path, cells_path):
@@ -59,17 +61,17 @@ class PCK:
         # Yolo 初始化
         model = DarknetPredict()
 
+        # Xception
         keys = list(tiff_dict.keys())
         total = len(keys)
 
         failed_tiff_lst = []
 
         # 遍历切割细胞，识别细胞分类
-        for index, tiff_name in enumerate(keys):
+        for index, tiff_name in enumerate(keys[:10]):
             print('Process %s / %s %s ...' % (index + 1, total, tiff_name))
 
             try:
-
                 images_lst = tiff_dict[tiff_name]
                 # 执行 Yolo 细胞分割
                 seg_results = model.predict(images_lst)
@@ -103,13 +105,25 @@ class PCK:
 
 
 if __name__ == "__main__":
-    # 608 图像存储路径
-    images_dir_path = '/home/tsimage/Development/DATA/remark'
 
-    # 中间文件存放目录
-    meta_files_path = '/home/tsimage/Development/DATA/meta'
+    test = False
+    if test:
+        # 608 图像存储路径
+        images_dir_path = '/home/tsimage/Development/DATA/test/remark'
 
-    # 识别出的细胞存储路径
-    cells_save_path = '/home/tsimage/Development/DATA/cells'
+        # 中间文件存放目录
+        meta_files_path = '/home/tsimage/Development/DATA/test/meta'
+
+        # 识别出的细胞存储路径
+        cells_save_path = '/home/tsimage/Development/DATA/test/cells'
+    else:
+        # 608 图像存储路径
+        images_dir_path = '/home/tsimage/Development/DATA/remark'
+
+        # 中间文件存放目录
+        meta_files_path = '/home/tsimage/Development/DATA/meta'
+
+        # 识别出的细胞存储路径
+        cells_save_path = '/home/tsimage/Development/DATA/cells'
 
     PCK(images_dir_path, meta_files_path, cells_save_path).run()
