@@ -67,12 +67,11 @@ class DarknetPredict:
             for point in points:
                 for index, item in enumerate(unique_point_collection):
                     ratio = cal_IOU(item, point[2])
-                    print(index, "=======>", ratio, item, point)
                     if ratio > 0.5:
+                        print("============>", ratio, item, point[2])
                         break
                 else:
                     unique_point_collection.append(point[2])
                     results_new[x_y].append(point)
-
 
         return results_new

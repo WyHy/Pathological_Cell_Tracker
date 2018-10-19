@@ -59,9 +59,11 @@ class PCK:
                     o.write('%s\t%s\n' % (key, '|'.join(lst)))
 
         # Yolo 初始化
-        model = DarknetPredict()
+        darknet_model = DarknetPredict()
 
-        # Xception
+        # Xception 初始化
+        xception_model = XceptionPredict()
+
         keys = list(tiff_dict.keys())
         total = len(keys)
 
@@ -73,8 +75,12 @@ class PCK:
 
             try:
                 images_lst = tiff_dict[tiff_name]
+
+                t0 = datetime.datetime.now()
                 # 执行 Yolo 细胞分割
-                seg_results = model.predict(images_lst)
+                seg_results = darknet_model.predict(images_lst)
+                t1 = datetime.datetime.now()
+                print("DARKNET COST %s" % (t1 - t0))
 
                 # 将细胞分割结果写入文件
                 xcep_pre = XceptionPreprocess(tiff_name)
@@ -85,7 +91,9 @@ class PCK:
                 cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
 
                 # 执行细胞分类
-                predictions = XceptionPredict().predict(cell_numpy)
+                predictions = xception_model.predict(cell_numpy)
+                t2 = datetime.datetime.now()
+                print("XCEPTION COST %s" % (t2 - t1))
 
                 # summarize two stages' result and generate a final csv
                 clas = XceptionPostprocess()
