@@ -24,7 +24,7 @@ class XceptionPredict:
         m_out = base_model.output
         p_out = GlobalAveragePooling2D()(m_out)
         fc_out = Dropout(1.0)(p_out)
-        predictions = Dense(16, activation='softmax')(fc_out)
+        predictions = Dense(cfg.xception.class_num, activation='softmax')(fc_out)
         self.model = Model(inputs=base_model.input, outputs=predictions)
         self.model.load_weights(weights_file)
 

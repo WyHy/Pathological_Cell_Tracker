@@ -101,3 +101,40 @@ def generate_name_path_dict(path, postfix=None, output_file_path=None):
 def get_tiff_dict():
     tif_path = '/home/tsimage/Development/DATA/tiff'
     return generate_name_path_dict(tif_path, ['.tif', '.kfb'])
+
+
+def cal_IOU(ret01, ret02):
+    """
+    计算矩阵重叠率
+    :param ret01: 矩阵01 （x1, y1, w1, h1）
+    :param ret02: 矩阵01 （x2, y2, w2, h2）
+    :return: 矩阵重叠率 ratio
+    """
+
+    x1, y1, w1, h1 = ret01
+    x1, y1, w1, h1 = int(x1), int(y1), int(w1), int(h1)
+
+    x2, y2, w2, h2 = ret02
+    x2, y2, w2, h2 = int(x2), int(y2), int(w2), int(h2)
+
+    endx = max(x1 + w1, x2 + w2)
+    startx = min(x1, x2)
+    w = w1 + w2 - (endx - startx)
+
+    endy = max(y1 + h1, y2 + h2)
+    starty = min(y1, y2)
+    h = h1 + h2 - (endy - starty)
+
+    if w <= 0 or h <= 0:
+        ratio = 0
+    else:
+        area = w * h
+        area01 = w1 * h1
+        area02 = w2 * h2
+        ratio = area / (area01 + area02 - area)
+
+    return ratio
+
+
+def rm_duplicates(lst01, lst02):
+    

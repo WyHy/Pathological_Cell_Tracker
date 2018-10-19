@@ -41,7 +41,11 @@ class PCK:
             print("GENERATE <TIFF_NAME>: <IMAGE_PATH_LIST> DICT ...")
             for item in images_lst:
                 basename = os.path.basename(item)
-                tiff_name, x, y = re.findall(pattern, basename)[0]
+                try:
+                    tiff_name, x, y = re.findall(pattern, basename)[0]
+                except:
+                    print(item)
+                    continue
 
                 if tiff_name in tiff_dict:
                     tiff_dict[tiff_name].append(item)
@@ -91,7 +95,6 @@ class PCK:
             except Exception as e:
                 print(str(e))
                 failed_tiff_lst.append((tiff_name, str(e)))
-
                 continue
 
         with open("failed_tiff_lst.txt", 'w') as o:

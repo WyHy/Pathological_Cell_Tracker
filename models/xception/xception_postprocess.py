@@ -217,11 +217,12 @@ class XceptionPostprocess:
         def get_labels(xmlname):
             if not os.path.isfile(xmlname):
                 return []
+
             classes = {"#aa0000": "HSIL", "#aa007f": "ASCH", "#005500": "LSIL", "#00557f": "ASCUS",
-                       "#0055ff": "SCC", "#aa557f": "ADC", "#aa55ff": "EC", "#ff5500": "AGC1",
-                       "#ff557f": "AGC2", "#ff55ff": "AGC3", "#00aa00": "FUNGI", "#00aa7f": "TRI",
-                       "#00aaff": "CC", "#55aa00": "ACTINO", "#55aa7f": "VIRUS", "#ffffff": "NORMAL",
-                       "#000000": "MC", "#aa00ff": "SC", "#ff0000": "RC", "#aa5500": "GEC"}
+                       "#0055ff": "SCC", "#aa55ff": "EC", "#ff5500": "AGC",
+                       "#00aa00": "FUNGI", "#00aa7f": "TRI", "#00aaff": "CC", "#55aa00": "ACTINO", 
+                       "#55aa7f": "VIRUS", "#ffffff": "NORMAL", "#000000": "MC", "#aa00ff": "SC", 
+                       "#ff0000": "RC", "#aa5500": "GEC"}
             DOMTree = xml.dom.minidom.parse(xmlname)
             collection = DOMTree.documentElement
             annotations = collection.getElementsByTagName("Annotation")

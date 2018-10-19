@@ -116,8 +116,18 @@ class XceptionPreprocess:
         return self.gen_np_array_mem(results=seg_dict, classes=classes, det=det, size=size)
 
     def gen_np_array_mem_(self, results, classes=cfg.darknet.classes, det=cfg.xception.det1, size=cfg.xception.size):
+
         def resize_img(img, size):
-            img_resized = img.resize((size, size))
+            img_croped = img.crop(
+                (
+                    -((size - img.size[0]) / 2),
+                    -((size - img.size[1]) / 2),
+                    img.size[0] + (size - img.size[0]) / 2,
+                    img.size[1] + (size - img.size[1]) / 2
+                )
+            )
+            img_resized = img_croped.resize((size, size))
+
             return img_resized
 
         tiff_dict = get_tiff_dict()
@@ -147,14 +157,26 @@ class XceptionPreprocess:
                     h = int(box[2][3])
                     # print("2=> %s, %s" % (x, y))
 
+                    # center_x = x + int(w / 2 + 0.5)
+                    # center_y = y + int(h / 2 + 0.5)
+                    # w_ = max(w, h)
+                    # h_ = w_
+
+                    # x_ = center_x - int(w_ / 2 + 0.5)
+                    # y_ = center_y - int(h_ / 2 + 0.5)
+
+                    # x_ = 0 if x_ < 0 else x_
+                    # y_ = 0 if y_ < 0 else y_
 
                     cell = slide.read_region((x, y), 0, (w, h)).convert("RGB")
+                    # cell = slide.read_region((x_, y_), 0, (w_, h_)).convert("RGB")
                     # image_name = "%s_%s_%s_%s.jpg" % (x, y, w, h)
                     # cell.save(os.path.join('/home/tsimage/Development/DATA/middle_cells', image_name))
 
                     cell_list.append(np.array(resize_img(cell, size)))
                     cell_index[index] = [x_y, list(box)]
                     index += 1
+
         slide.close()
         return np.asarray(cell_list), cell_index
 

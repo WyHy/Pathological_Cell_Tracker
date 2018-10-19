@@ -44,9 +44,16 @@ __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.n
 __C.xception = edict()
 __C.xception.det1 = -0.05  # used in gen_np_array
 __C.xception.size = 299
-__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_110.h5")
+# __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_110.h5")
+__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune.h5")
+
 __C.xception.classes = ["ACTINO", "AGC", "ASCH", "ASCUS", "CC", "EC", "FUNGI", 
                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
+__C.xception.class_num = 16
+
+# __C.xception.classes = ["ACTINO", "ADC", "AGC1", "AGC2", "ASCH", "ASCUS", "CC", "EC", "FUNGI", 
+#                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
+# __C.xception.class_num = 18
 __C.xception.det2 = 0.1   # used in gen output csv file
 
 
