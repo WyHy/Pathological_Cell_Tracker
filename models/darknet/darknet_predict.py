@@ -65,8 +65,10 @@ class DarknetPredict:
             points = rm_duplicate_point(boxes)
             # point = (label, accuracy, (x, y, w, h))
             for point in points:
-                for item in unique_point_collection:
-                    if cal_IOU(item, point[2]) > 0.5:
+                for index, item in enumerate(unique_point_collection):
+                    ratio = cal_IOU(item, point[2])
+                    print(index, "=======>", ratio, item, point)
+                    if ratio > 0.5:
                         break
                 else:
                     unique_point_collection.append(point[2])

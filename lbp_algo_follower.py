@@ -105,8 +105,9 @@ class PCK:
 
 
 if __name__ == "__main__":
+    # wanna test?
+    test = True
 
-    test = False
     if test:
         # 608 图像存储路径
         images_dir_path = '/home/tsimage/Development/DATA/test/remark'
