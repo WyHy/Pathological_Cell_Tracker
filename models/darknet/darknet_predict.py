@@ -1,5 +1,6 @@
 from models.darknet.darknet import *
 from config.config import cfg
+from utils import rm_duplicate_point
 
 
 class DarknetPredict:
@@ -33,18 +34,18 @@ class DarknetPredict:
                 f.write("%s = %s\n" % (key, value))
 
     def predict(self, images):
-        def rm_duplicates(boxes):
-            boxes_new = []
-            for box in boxes:
-                if len(boxes_new) == 0:
-                    boxes_new.append(box)
-                is_dup = False
-                for box_new in boxes_new:
-                    if abs(box[2][0] - box_new[2][0]) < 1.0 and abs(box[2][1] - box_new[2][1]) < 1.0:
-                        is_dup = True
-                if not is_dup:
-                    boxes_new.append(box)
-            return boxes_new
+        # def rm_duplicates(boxes):
+        #     boxes_new = []
+        #     for box in boxes:
+        #         if len(boxes_new) == 0:
+        #             boxes_new.append(box)
+        #         is_dup = False
+        #         for box_new in boxes_new:
+        #             if abs(box[2][0] - box_new[2][0]) < 1.0 and abs(box[2][1] - box_new[2][1]) < 1.0:
+        #                 is_dup = True
+        #         if not is_dup:
+        #             boxes_new.append(box)
+        #     return boxes_new
 
         results = {}
         for image in images:
@@ -55,14 +56,8 @@ class DarknetPredict:
         for x_y, boxes in results.items():
             if len(boxes) == 0:
                 continue
-            results_new[x_y] = []
-            boxes = rm_duplicates(boxes)
-            for box in boxes:
-                box_new = [box[0],
-                           box[1],
-                           [box[2][0] - box[2][2] / 2,
-                            box[2][1] - box[2][3] / 2,
-                            box[2][2],
-                            box[2][3]]]
-                results_new[x_y].append(box_new)
+
+            # 坐标去重处理
+            results_new[x_y] = rm_duplicate_point(boxes)
+
         return results_new

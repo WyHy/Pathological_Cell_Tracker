@@ -136,5 +136,27 @@ def cal_IOU(ret01, ret02):
     return ratio
 
 
-def rm_duplicates(lst01, lst02):
-    
+def rm_duplicate_point(point_lst):
+    """
+    删除重合度较高的标注点坐标
+    :param point_lst: 标注点坐标列表
+    :return: 去重后的标注点坐标列表
+    """
+
+    return_lst = []
+    pure_lst = []
+
+    for point in point_lst:
+        label, accuracy, center_x, center_y, w, h = point[0], point[1], point[2][0], point[2][1], point[2][2], point[2][3]
+        x, y = center_x - (w / 2), center_y - (h / 2)
+        for item in pure_lst:
+            point_ = (x, y, w, h)
+            if cal_IOU(item, point_) > 0.5:
+                break
+        else:
+            pure_lst.append(point_)
+            return_lst.append((label, accuracy, point_))
+
+    return return_lst
+
+
