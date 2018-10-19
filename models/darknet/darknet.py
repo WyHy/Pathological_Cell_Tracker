@@ -135,6 +135,9 @@ def classify(net, meta, im):
 
 
 def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
+    """
+    returen [(label, accuracy, center_x, center_y, w, h)]
+    """
     im = load_image(image.encode('utf-8'), 0, 0)
     num = c_int(0)
     pnum = pointer(num)
