@@ -1,6 +1,7 @@
 from models.darknet.darknet import *
 from config.config import cfg
 from utils import rm_duplicate_point, cal_IOU
+import re
 
 
 class DarknetPredict:
@@ -17,6 +18,7 @@ class DarknetPredict:
 
         self.net = load_net(cfg.darknet.cfg_file.encode('utf-8'), cfg.darknet.weights_file.encode('utf-8'), 0)
         self.meta = load_meta(cfg.darknet.datacfg_file.encode('utf-8'))
+        self.pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
     def gen_datacfg_file(self):
         # for minitest.data
@@ -63,15 +65,21 @@ class DarknetPredict:
             results_new[x_y] = []
 
             points = rm_duplicate_point(boxes)
+            
+            _, start_x, start_y = re.findall(self.pattern, x_y)[0]
+            start_x, start_y = int(start_x), int(start_y)
+
             # point = (label, accuracy, (x, y, w, h))
             for point in points:
+                x, y, w, h = point[2]
+                x, y = x + start_x, y + start_y
+
                 for index, item in enumerate(unique_point_collection):
-                    ratio = cal_IOU(item, point[2])
+                    ratio = cal_IOU(item, (x, y, w, h))
                     if ratio > 0.5:
-                        print("============>", ratio, item, point[2])
                         break
                 else:
-                    unique_point_collection.append(point[2])
+                    unique_point_collection.append((x, y, w, h))
                     results_new[x_y].append(point)
 
         return results_new
