@@ -70,7 +70,7 @@ class PCK:
         failed_tiff_lst = []
 
         # 遍历切割细胞，识别细胞分类
-        for index, tiff_name in enumerate(keys[:10]):
+        for index, tiff_name in enumerate(keys):
             print('Process %s / %s %s ...' % (index + 1, total, tiff_name))
 
             try:
@@ -114,7 +114,7 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = True
+    test = False
 
     if test:
         # 608 图像存储路径
