@@ -102,6 +102,8 @@ class PCK:
                 clas.write_csv(clas_dict, clas_csv)
 
                 clas.cut_cells_p_marked_(tiff_name, clas_dict, self.cells_path, factor=0.2, N=2)
+                t3 = datetime.datetime.now()
+                print("GET VIEW IMAGES COST %s" % (t3 - t2))
             except Exception as e:
                 print(str(e))
                 failed_tiff_lst.append((tiff_name, str(e)))

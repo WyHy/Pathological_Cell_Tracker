@@ -34,9 +34,10 @@ __C.darknet = edict()
 __C.darknet.classes = ["ASCUS", "LSIL", "ASCH", "HSIL", "SCC", "AGC", "EC", "FUNGI", "TRI", "CC", "ACTINO", "VIRUS"]
 __C.darknet.dartnetlib = os.path.join(curr_path, "models/darknet/libdarknet.so")
 __C.darknet.cfg_file = os.path.join(curr_path, "models/darknet/yolov3-minitest-12-infer.cfg")
-__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_300000.weights")
+__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_final.weights")
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-12-1009.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.names")
+__C.darknet.thresh = 0.05
 
 #
 # xception param for 16 classes

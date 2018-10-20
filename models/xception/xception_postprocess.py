@@ -282,6 +282,7 @@ class XceptionPostprocess:
                 else:
                     image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
                     save_path_i = os.path.join(save_path, box[2])
+                    
                 os.makedirs(save_path_i, exist_ok=True)
                 image_fullname = os.path.join(save_path_i, image_name)
                 slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,
