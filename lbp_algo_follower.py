@@ -116,6 +116,7 @@ if __name__ == "__main__":
     # wanna test?
     test = False
 
+    t0 = datetime.datetime.now()
     if test:
         # 608 图像存储路径
         images_dir_path = '/home/tsimage/Development/DATA/test/remark'
@@ -135,4 +136,9 @@ if __name__ == "__main__":
         # 识别出的细胞存储路径
         cells_save_path = '/home/tsimage/Development/DATA/cells'
 
+
     PCK(images_dir_path, meta_files_path, cells_save_path).run()
+
+    t1 = datetime.datetime.now()
+
+    print("TOTAL COST %s ..." % (t1 - t0))

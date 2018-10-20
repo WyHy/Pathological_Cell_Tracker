@@ -1,5 +1,5 @@
-names = /home/tsimage/Development/code/Pathological_Cell_Tracker/models/darknet/minitest-12.names
 backup = backup
-train = train.txt
 classes = 12
 valid = valid.txt
+names = /home/tsimage/Development/code/Pathological_Cell_Tracker/models/darknet/minitest-12.names
+train = train.txt

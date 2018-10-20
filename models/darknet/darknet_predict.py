@@ -36,18 +36,18 @@ class DarknetPredict:
                 f.write("%s = %s\n" % (key, value))
 
     def predict(self, images):
-        def rm_duplicates(boxes):
-            boxes_new = []
-            for box in boxes:
-                if len(boxes_new) == 0:
-                    boxes_new.append(box)
-                is_dup = False
-                for box_new in boxes_new:
-                    if abs(box[2][0] - box_new[2][0]) < 1.0 and abs(box[2][1] - box_new[2][1]) < 1.0:
-                        is_dup = True
-                if not is_dup:
-                    boxes_new.append(box)
-            return boxes_new
+        # def rm_duplicates(boxes):
+        #     boxes_new = []
+        #     for box in boxes:
+        #         if len(boxes_new) == 0:
+        #             boxes_new.append(box)
+        #         is_dup = False
+        #         for box_new in boxes_new:
+        #             if abs(box[2][0] - box_new[2][0]) < 1.0 and abs(box[2][1] - box_new[2][1]) < 1.0:
+        #                 is_dup = True
+        #         if not is_dup:
+        #             boxes_new.append(box)
+        #     return boxes_new
 
         results = {}
         for image in images:
@@ -55,14 +55,13 @@ class DarknetPredict:
             results[os.path.splitext(os.path.basename(image))[0]] = detect(self.net, self.meta, image, self.thresh,
                                                                            self.hier_thresh, self.nms)
 
-
         results_new = {}
         for x_y, boxes in results.items():
             if len(boxes) == 0:
                 continue
                 
             results_new[x_y] = []
-            boxes = rm_duplicates(boxes)
+            # boxes = rm_duplicates(boxes)
             for box in boxes:
                 box_new = [box[0],
                            box[1],
