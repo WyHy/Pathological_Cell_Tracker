@@ -88,11 +88,11 @@ class PCK:
             clas_csv = os.path.join(self.meta_files_path, tiff_basename + "_clas.csv")
             clas.write_csv(clas_dict, clas_csv)
 
-            # 预测诊断结果
-            final_diagnose_result = dst_model.predict(clas_dict)
-            print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
+            # # 预测诊断结果
+            # final_diagnose_result = dst_model.predict(clas_dict)
+            # print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
 
-            clas.cut_cells_p_marked(tiff_basename, clas_dict, os.path.join(self.cells_path, final_diagnose_result), factor=0.2, N=2)
+            clas.cut_cells_p_marked(tiff_basename, clas_dict, self.cells_path, factor=0.2, N=2)
             t3 = datetime.datetime.now()
             print("GET VIEW IMAGES COST %s" % (t3 - t2))
 
