@@ -1,15 +1,12 @@
 import datetime
-import shutil
-import sys
 import re
-from common.utils import FilesScanner, ImageSlice
+
+from common.utils import FilesScanner
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
-
-import datetime
 
 
 class PCK:
@@ -137,7 +134,6 @@ if __name__ == "__main__":
 
         # 识别出的细胞存储路径
         cells_save_path = '/home/tsimage/Development/DATA/cells'
-
 
     PCK(images_dir_path, meta_files_path, cells_save_path).run()
 

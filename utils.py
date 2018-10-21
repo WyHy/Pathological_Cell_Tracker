@@ -161,3 +161,24 @@ def rm_duplicate_point(point_lst):
     return return_lst
 
 
+def get_processed_lst(clas_files_path, cell_images_path):
+    clas_files = os.listdir(clas_files_path)
+    cell_lst = os.listdir(cell_images_path)
+
+    clas_lst = [item.replace("_clas.csv", "") for item in clas_files if item.endswith("_clas.csv")]
+
+    print("CLAS FILES LENGTH: %s, IMAGE DIRS LENGTH: %s" % (len(clas_lst), len(cell_lst)))
+
+    for item in clas_lst:
+        if item in cell_lst:
+            pass
+        else:
+            print(item)
+            exit()
+
+
+if __name__ == '__main__':
+    clas_files_path = '/home/tsimage/Development/DATA/meta'
+    cell_images_path = '/home/tsimage/Development/DATA/cells'
+
+    get_processed_lst(clas_files_path, cell_images_path)
