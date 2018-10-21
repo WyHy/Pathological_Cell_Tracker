@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     resource_path = '/home/cnn/Development/DATA/RESOURCE'
 
-    if test:
+    if not test:
         # TIFF 图像存储路径
         tiff_dir_path = os.path.join(resource_path, 'TIFF')
 
