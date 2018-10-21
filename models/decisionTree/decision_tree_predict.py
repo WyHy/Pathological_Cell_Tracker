@@ -11,7 +11,7 @@ class DecisionTreePredict(object):
 
     def predict(self, dict_):
         X = [0] * len(self.classes)
-        for key, lst in dict_.iteems():
+        for key, lst in dict_.items():
             for item in lst:
                 index = self.classes.index(item[3])
                 X[index] += 1
