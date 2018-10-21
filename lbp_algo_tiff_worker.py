@@ -47,7 +47,8 @@ class PCK:
         total = len(tiff_lst)
         for index, tiff in enumerate(self.tiff_lst):
             # 获取大图文件名，不带后缀
-            tiff_basename, _ = os.path.splitext(os.path.basename(tiff)).replace(" ", "_")
+            tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
+            tiff_basename = tiff_basename.replace(" ", "_")
             print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
             # 切片文件存储路径
@@ -98,7 +99,7 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = False
+    test = True
 
     t0 = datetime.datetime.now()
 
@@ -142,6 +143,9 @@ if __name__ == "__main__":
         except Exception as e:
             raise Exception("%s %s" % (tiff, str(e)))
 
+    for item in [slice_dir_path, meta_files_path, cells_save_path]:
+        if not os.path.exists(item):
+            os.makedirs(item)
     PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
 
     t1 = datetime.datetime.now()
