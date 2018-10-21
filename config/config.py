@@ -37,7 +37,7 @@ __C.darknet.cfg_file = os.path.join(curr_path, "models/darknet/yolov3-minitest-1
 __C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_final.weights")
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-12-1009.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.names")
-__C.darknet.thresh = 0.05
+__C.darknet.thresh = 0.5
 
 #
 # xception param for 16 classes
@@ -56,6 +56,12 @@ __C.xception.class_num = 16
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 # __C.xception.class_num = 18
 __C.xception.det2 = 0.1   # used in gen output csv file
+
+
+# decision tree
+__C.decision_tree = edict()
+__C.decision_tree.classes_files = os.path.join(curr_path, "dataset_files/Classes.txt")
+__C.decision_tree.model = os.path.join(curr_path, "dataset_files/dts.model")
 
 
 # xgboost param

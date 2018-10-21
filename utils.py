@@ -147,10 +147,11 @@ def rm_duplicate_point(point_lst):
     pure_lst = []
 
     for point in point_lst:
-        label, accuracy, center_x, center_y, w, h = point[0], point[1], point[2][0], point[2][1], point[2][2], point[2][3]
+        label, accuracy, center_x, center_y, w, h = point[0], point[1], point[2][0], point[2][1], point[2][2], point[2][
+            3]
         x, y = center_x - (w / 2), center_y - (h / 2)
         point_ = (x, y, w, h)
-        
+
         for item in pure_lst:
             if cal_IOU(item, point_) > 0.5:
                 break
@@ -180,6 +181,13 @@ def get_processed_lst(clas_files_path, cell_images_path):
     print('GOT %s PROCESSED' % count)
 
     return clas_lst
+
+
+def load_classes(path):
+    with open(path) as f:
+        lines = f.readlines()
+        return [line.replace('\n', '') for line in lines]
+
 
 if __name__ == '__main__':
     clas_files_path = '/home/tsimage/Development/DATA/meta'
