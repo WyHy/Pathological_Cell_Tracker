@@ -61,7 +61,7 @@ __C.xception.det2 = 0.1   # used in gen output csv file
 # decision tree
 __C.decision_tree = edict()
 __C.decision_tree.classes_files = os.path.join(curr_path, "dataset_files/Classes.txt")
-__C.decision_tree.model = os.path.join(curr_path, "dataset_files/dts.model")
+__C.decision_tree.model = os.path.join(curr_path, "dataset_files/dst.model")
 
 
 # xgboost param
