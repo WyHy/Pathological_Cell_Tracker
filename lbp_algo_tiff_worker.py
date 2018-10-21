@@ -91,7 +91,7 @@ class PCK:
             final_diagnose_result = dst_model.predict(clas_dict)
             print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
 
-            clas.cut_cells_p_marked_(tiff_basename, clas_dict, self.cells_path, factor=0.2, N=2)
+            clas.cut_cells_p_marked_(tiff_basename, clas_dict, os.path.join(self.cells_path, final_diagnose_result), factor=0.2, N=2)
             t3 = datetime.datetime.now()
             print("GET VIEW IMAGES COST %s" % (t3 - t2))
 
