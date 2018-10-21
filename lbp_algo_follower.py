@@ -2,6 +2,7 @@ import datetime
 import re
 
 from common.utils import FilesScanner
+from utils import get_processed_lst
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
 from models.xception.xception_postprocess import XceptionPostprocess
@@ -61,14 +62,28 @@ class PCK:
         # Xception 初始化
         xception_model = XceptionPredict()
 
+        print("MODEL INITIAL DONE...")
+
         keys = list(tiff_dict.keys())
         total = len(keys)
 
         failed_tiff_lst = []
 
+        # get which processed
+        clas_files_path = '/home/tsimage/Development/DATA/meta'
+        cell_images_path = '/home/tsimage/Development/DATA/cells'
+
+        already_processed = get_processed_lst(clas_files_path, cell_images_path)
+
         # 遍历切割细胞，识别细胞分类
+        count = 0
         for index, tiff_name in enumerate(keys):
             print('Process %s / %s %s ...' % (index + 1, total, tiff_name))
+            if tiff_name in already_processed:
+                print("ALREADY PROCESSED!")
+                continue
+            else:
+                count += 1
 
             try:
                 images_lst = tiff_dict[tiff_name]

@@ -169,13 +169,17 @@ def get_processed_lst(clas_files_path, cell_images_path):
 
     print("CLAS FILES LENGTH: %s, IMAGE DIRS LENGTH: %s" % (len(clas_lst), len(cell_lst)))
 
+    count = 0
     for item in clas_lst:
         if item in cell_lst:
-            pass
+            count += 1
         else:
             print(item)
             exit()
 
+    print('GOT %s PROCESSED' % count)
+
+    return clas_lst
 
 if __name__ == '__main__':
     clas_files_path = '/home/tsimage/Development/DATA/meta'
