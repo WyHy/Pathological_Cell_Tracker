@@ -228,11 +228,9 @@ class ImageSlice(object):
             print("Image Process %s ..." % image)
 
             try:
-                slide = None
-                if image.endswith(".tif"):
+                try:
                     slide = openslide.OpenSlide(image)
-
-                if image.endswith(".kfb"):
+                except:
                     slide = TSlide(image)
 
                 if slide:

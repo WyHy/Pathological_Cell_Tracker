@@ -55,9 +55,9 @@ class PCK:
             slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
 
             # 如果路径下切图文件不存在，执行切图
-            if not os.path.join(slice_save_path):
-                # 执行切图
-                ImageSlice(tiff, self.slice_save_path).get_slices()
+            # if not os.path.join(slice_save_path):
+            #     # 执行切图
+            ImageSlice(tiff, self.slice_save_path).get_slices()
 
             # 获取切图文件路径
             tif_images = FilesScanner(slice_save_path, ['.jpg']).get_files()
