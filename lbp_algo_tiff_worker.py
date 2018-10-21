@@ -70,7 +70,7 @@ class PCK:
             print("DARKNET COST %s" % (t1 - t0))
 
             # 将细胞分割结果写入文件
-            xcep_pre = XceptionPreprocess(tiff_basename)
+            xcep_pre = XceptionPreprocess(tiff)
             seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
             xcep_pre.write_csv(seg_results, seg_csv)
 
