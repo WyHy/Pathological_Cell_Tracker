@@ -75,7 +75,7 @@ class PCK:
             xcep_pre.write_csv(seg_results, seg_csv)
 
             # generate numpy array, it is the input of second stage classification algorithm
-            cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
+            cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
 
             print("XCEPTION PROCESSING ...")
             # 执行细胞分类
@@ -92,7 +92,7 @@ class PCK:
             final_diagnose_result = dst_model.predict(clas_dict)
             print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
 
-            clas.cut_cells_p_marked_(tiff_basename, clas_dict, os.path.join(self.cells_path, final_diagnose_result), factor=0.2, N=2)
+            clas.cut_cells_p_marked(tiff_basename, clas_dict, os.path.join(self.cells_path, final_diagnose_result), factor=0.2, N=2)
             t3 = datetime.datetime.now()
             print("GET VIEW IMAGES COST %s" % (t3 - t2))
 
