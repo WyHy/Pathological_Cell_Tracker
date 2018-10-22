@@ -152,25 +152,14 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = False
+    test = True
 
     t0 = datetime.datetime.now()
 
-    resource_path = '/home/cnn/Development/DATA/RESOURCE'
+    # resource_path = '/home/cnn/Development/DATA/RESOURCE'
+    resource_path = '/home/tsimage/Development/DATA/RESOURCE'
 
-    if not test:
-        # TIFF 图像存储路径
-        tiff_dir_path = os.path.join(resource_path, 'TIFF')
-
-        # 切图文件存储路径
-        slice_dir_path = os.path.join(resource_path, 'SLICE')
-
-        # 中间文件存放目录
-        meta_files_path = os.path.join(resource_path, 'META')
-
-        # 识别出的细胞存储路径
-        cells_save_path = os.path.join(resource_path, 'CELLS')
-    else:
+    if test:
         # TIFF 图像存储路径
         tiff_dir_path = os.path.join(resource_path, 'test', 'TIFF')
 
@@ -182,6 +171,18 @@ if __name__ == "__main__":
 
         # 识别出的细胞存储路径
         cells_save_path = os.path.join(resource_path, 'test', 'CELLS')
+    else:
+        # TIFF 图像存储路径
+        tiff_dir_path = os.path.join(resource_path, 'TIFF')
+
+        # 切图文件存储路径
+        slice_dir_path = os.path.join(resource_path, 'SLICE')
+
+        # 中间文件存放目录
+        meta_files_path = os.path.join(resource_path, 'META')
+
+        # 识别出的细胞存储路径
+        cells_save_path = os.path.join(resource_path, 'CELLS')
 
     # 获取 TIFF 图像文件地址列表
     tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
