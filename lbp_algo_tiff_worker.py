@@ -99,7 +99,7 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = True
+    test = False
 
     t0 = datetime.datetime.now()
 
