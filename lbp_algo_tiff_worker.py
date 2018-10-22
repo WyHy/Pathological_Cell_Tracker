@@ -27,15 +27,14 @@ def yolo_predict(gpu_index, images_lst):
     return DarknetPredict(str(gpu_index)).predict(images_lst)
 
 
-def xception_predict(gpu_index, images_numpy, cell_index):
+def xception_predict(gpu_index, images_numpy):
     """
     Xception 识别细胞病理分类
-    :param cell_index:
     :param gpu_index: gpu id
     :param images_numpy: image numpy_array
     :return:
     """
-    return XceptionPredict(str(gpu_index)).predict(images_numpy), cell_index
+    return XceptionPredict(str(gpu_index)).predict(images_numpy)
 
 
 class PCK:
@@ -117,20 +116,17 @@ class PCK:
             # 任务切分
             n = int((len(cell_index) / float(GPU_NUM)) + 0.5)
             cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_index), n)]
-            index_patches = [cell_index[i: i + n] for i in range(0, len(cell_index), n)]
 
             tasks = []
             # 创建切图进程池
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
             for gpu_index, patch in enumerate(cell_patches):
-                tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch), index_patches[gpu_index]))
+                tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
 
             predictions = []
-            cell_index = []
             for future in as_completed(tasks):
                 result = future.result()
                 predictions.extend(result[0])
-                cell_index.extend(result[1])
 
             # 关闭进程池
             executor.shutdown(wait=True)
