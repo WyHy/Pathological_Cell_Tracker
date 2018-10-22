@@ -31,6 +31,8 @@ def main(file_path):
         except Exception as e:
             raise Exception("%s %s" % (item, str(e)))
 
+    print('\n'.join(miss_tiff_lst))
+
 
 if __name__ == '__main__':
     main('work_tiff_list.txt')
