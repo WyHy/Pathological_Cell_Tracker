@@ -109,7 +109,7 @@ class PCK:
 
                 # WRITE DATA TO CSV
                 xcep_pre.write_csv(seg_results, seg_csv)
-                
+
             t2 = datetime.datetime.now()
             print("DARKNET COST %s" % (t2 - t1))
 
@@ -132,7 +132,7 @@ class PCK:
             predictions = []
             for future in as_completed(tasks):
                 result = future.result()
-                predictions.extend(result[0])
+                predictions.extend(result)
 
             # 关闭进程池
             executor.shutdown(wait=True)
