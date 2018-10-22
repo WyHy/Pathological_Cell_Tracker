@@ -80,33 +80,38 @@ class PCK:
             t1 = datetime.datetime.now()
             print('TIFF SLICE COST: %s' % (t1 - t0))
 
-            #################################### YOLO 处理 #####################################################
-            # 任务切分
-            n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-            patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
-
-            tasks = []
-
-            # 创建切图进程池
-            executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-            for gpu_index, patch in enumerate(patches):
-                tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
-
-            seg_results = {}
-            for future in as_completed(tasks):
-                result = future.result()
-                seg_results.update(result)
-
-            # 关闭进程池
-            executor.shutdown(wait=True)
-
-            t2 = datetime.datetime.now()
-            print("DARKNET COST %s" % (t2 - t1))
+            # CHECK IF ALREADY PROCESSED
+            seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
 
             # 将细胞分割结果写入文件
             xcep_pre = XceptionPreprocess(tiff)
-            seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
-            xcep_pre.write_csv(seg_results, seg_csv)
+
+            if not os.path.exists(seg_csv):
+                #################################### YOLO 处理 #####################################################
+                # 任务切分
+                n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
+                patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
+
+                tasks = []
+
+                # 创建切图进程池
+                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                for gpu_index, patch in enumerate(patches):
+                    tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
+
+                seg_results = {}
+                for future in as_completed(tasks):
+                    result = future.result()
+                    seg_results.update(result)
+
+                # 关闭进程池
+                executor.shutdown(wait=True)
+
+                # WRITE DATA TO CSV
+                xcep_pre.write_csv(seg_results, seg_csv)
+                t2 = datetime.datetime.now()
+                print("DARKNET COST %s" % (t2 - t1))
+
 
             # XCEPTION preprocess
             cell_lst, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
@@ -136,7 +141,7 @@ class PCK:
 
             clas = XceptionPostprocess()
             clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-            clas_csv = os.path.join(self.meta_files_path, tiff_basename + "_clas.csv")
+            clas_csv = os.path.join(self.meta_files_path, tiff_basename + '_clas.csv')
             clas.write_csv(clas_dict, clas_csv)
 
             ############################### 获取审核图像 ######################################################
