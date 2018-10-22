@@ -109,8 +109,9 @@ class PCK:
 
                 # WRITE DATA TO CSV
                 xcep_pre.write_csv(seg_results, seg_csv)
-                t2 = datetime.datetime.now()
-                print("DARKNET COST %s" % (t2 - t1))
+                
+            t2 = datetime.datetime.now()
+            print("DARKNET COST %s" % (t2 - t1))
 
 
             # XCEPTION preprocess
