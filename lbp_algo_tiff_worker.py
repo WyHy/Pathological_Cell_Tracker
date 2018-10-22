@@ -145,6 +145,8 @@ class PCK:
             t4 = datetime.datetime.now()
             print("GET VIEW IMAGES COST %s" % (t4 - t2))
 
+            print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
+
 
 if __name__ == "__main__":
     # wanna test?
@@ -152,8 +154,8 @@ if __name__ == "__main__":
 
     t0 = datetime.datetime.now()
 
-    # resource_path = '/home/cnn/Development/DATA/RESOURCE'
-    resource_path = '/home/tsimage/Development/DATA/RESOURCE'
+    resource_path = '/home/cnn/Development/DATA/RESOURCE'
+    # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
 
     if test:
         # TIFF 图像存储路径
