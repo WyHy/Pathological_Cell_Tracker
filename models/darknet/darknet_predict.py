@@ -1,18 +1,19 @@
-from models.darknet.darknet import *
-from config.config import cfg
-from utils import rm_duplicate_point, cal_IOU
 import re
+
+from config.config import cfg
+from models.darknet.darknet import *
+from utils import cal_IOU
 
 
 class DarknetPredict:
 
-    def __init__(self, thresh=cfg.darknet.thresh, hier_thresh=.5, nms=.45, gpu='0'):
+    def __init__(self, gpu='0'):
 
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
-        self.thresh = thresh
-        self.hier_thresh = hier_thresh
-        self.nms = nms
+        self.thresh = cfg.darknet.thresh
+        self.hier_thresh = cfg.darknet.hier_thresh
+        self.nms = cfg.darknet.nms
 
         self.gen_datacfg_file()
 
@@ -67,7 +68,7 @@ class DarknetPredict:
         for x_y, boxes in results.items():
             if len(boxes) == 0:
                 continue
-                
+
             results_new[x_y] = []
             boxes = rm_duplicates(boxes)
             for box in boxes:
@@ -83,8 +84,6 @@ class DarknetPredict:
 
         return results_new
 
-
-
         ########################################################################################
 
         # unique_point_collection = []
@@ -97,7 +96,7 @@ class DarknetPredict:
         #     results_new[x_y] = []
 
         #     points = rm_duplicate_point(boxes)
-            
+
         #     _, start_x, start_y = re.findall(self.pattern, x_y)[0]
         #     start_x, start_y = int(start_x), int(start_y)
 

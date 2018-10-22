@@ -38,6 +38,8 @@ __C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minites
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-12-1009.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.names")
 __C.darknet.thresh = 0.1
+__C.darknet.hier_thresh = 0.5
+__C.darknet.nms = 0.45
 
 #
 # xception param for 16 classes

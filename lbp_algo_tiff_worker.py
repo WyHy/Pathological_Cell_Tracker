@@ -13,6 +13,7 @@ from models.xception.xception_preprocess import XceptionPreprocess
 from utils import FilesScanner
 from sklearn.externals import joblib
 
+GPU_NUM = os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n') - 1
 
 class PCK:
     def __init__(self, tiff_lst, slice_dir_path, meta_files_path, cells_path):
@@ -35,66 +36,87 @@ class PCK:
 
     def run(self):
         print("Initial DARKNET and XCEPTION model ...")
+
         # Yolo 初始化
-        darknet_model = DarknetPredict()
+        darknet_models = []
 
         # Xception 初始化
-        xception_model = XceptionPredict()
+        xception_models = []
+        for i in range(GPU_NUM):
+            darknet_models.append(DarknetPredict(str(i)))
+            xception_models.append(XceptionPredict(str(i)))
 
-        # Decision Tree 初始化
-        dst_model = DecisionTreePredict()
 
-        total = len(tiff_lst)
-        for index, tiff in enumerate(self.tiff_lst):
-            # 获取大图文件名，不带后缀
-            tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
-            tiff_basename = tiff_basename.replace(" ", "_")
-            print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
-
-            # 切片文件存储路径
-            slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
-
-            # 如果路径下切图文件不存在，执行切图
-            if not os.path.exists(slice_save_path):
-                # 执行切图
-                ImageSlice(tiff, self.slice_dir_path).get_slices()
-
-            # 获取切图文件路径
-            tif_images = FilesScanner(slice_save_path, ['.jpg']).get_files()
-
-            print("DARKNET PROCESSING ...")
-            t0 = datetime.datetime.now()
-            # 执行 Yolo 细胞分割
-            seg_results = darknet_model.predict(tif_images)
-            t1 = datetime.datetime.now()
-            print("DARKNET COST %s" % (t1 - t0))
-
-            # 将细胞分割结果写入文件
-            xcep_pre = XceptionPreprocess(tiff)
-            seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
-            xcep_pre.write_csv(seg_results, seg_csv)
-
-            # generate numpy array, it is the input of second stage classification algorithm
-            cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
-
-            print("XCEPTION PROCESSING ...")
-            # 执行细胞分类
-            predictions = xception_model.predict(cell_numpy)
-            t2 = datetime.datetime.now()
-            print("XCEPTION COST %s" % (t2 - t1))
-
-            clas = XceptionPostprocess()
-            clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-            clas_csv = os.path.join(self.meta_files_path, tiff_basename + "_clas.csv")
-            clas.write_csv(clas_dict, clas_csv)
-
-            # # 预测诊断结果
-            # final_diagnose_result = dst_model.predict(clas_dict)
-            # print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
-
-            clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
-            t3 = datetime.datetime.now()
-            print("GET VIEW IMAGES COST %s" % (t3 - t2))
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        # n = int(math.ceil(len(patches) / float(gpu_count)))
+        # patches = [patches[i: i + n] for i in range(0, len(patches), n)]
+        #
+        # # Yolo 初始化
+        # darknet_model = DarknetPredict()
+        #
+        # # Xception 初始化
+        # xception_model = XceptionPredict()
+        #
+        # # Decision Tree 初始化
+        # dst_model = DecisionTreePredict()
+        #
+        # total = len(tiff_lst)
+        # for index, tiff in enumerate(self.tiff_lst):
+        #     # 获取大图文件名，不带后缀
+        #     tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
+        #     tiff_basename = tiff_basename.replace(" ", "_")
+        #     print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
+        #
+        #     # 切片文件存储路径
+        #     slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
+        #
+        #     # 如果路径下切图文件不存在，执行切图
+        #     if not os.path.exists(slice_save_path):
+        #         # 执行切图
+        #         ImageSlice(tiff, self.slice_dir_path).get_slices()
+        #
+        #     # 获取切图文件路径
+        #     tif_images = FilesScanner(slice_save_path, ['.jpg']).get_files()
+        #
+        #     print("DARKNET PROCESSING ...")
+        #     t0 = datetime.datetime.now()
+        #     # 执行 Yolo 细胞分割
+        #     seg_results = darknet_model.predict(tif_images)
+        #     t1 = datetime.datetime.now()
+        #     print("DARKNET COST %s" % (t1 - t0))
+        #
+        #     # 将细胞分割结果写入文件
+        #     xcep_pre = XceptionPreprocess(tiff)
+        #     seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
+        #     xcep_pre.write_csv(seg_results, seg_csv)
+        #
+        #     # generate numpy array, it is the input of second stage classification algorithm
+        #     cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
+        #
+        #     print("XCEPTION PROCESSING ...")
+        #     # 执行细胞分类
+        #     predictions = xception_model.predict(cell_numpy)
+        #     t2 = datetime.datetime.now()
+        #     print("XCEPTION COST %s" % (t2 - t1))
+        #
+        #     clas = XceptionPostprocess()
+        #     clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
+        #     clas_csv = os.path.join(self.meta_files_path, tiff_basename + "_clas.csv")
+        #     clas.write_csv(clas_dict, clas_csv)
+        #
+        #     # # 预测诊断结果
+        #     # final_diagnose_result = dst_model.predict(clas_dict)
+        #     # print("FINAL DIAGNOSE RESULT IS %s" % final_diagnose_result)
+        #
+        #     clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
+        #     t3 = datetime.datetime.now()
+        #     print("GET VIEW IMAGES COST %s" % (t3 - t2))
 
 
 if __name__ == "__main__":
