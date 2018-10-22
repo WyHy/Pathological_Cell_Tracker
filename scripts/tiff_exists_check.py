@@ -15,9 +15,12 @@ def main(file_path):
         lines = f.readlines()
         items = [line.replace('\n', '') for line in lines]
 
+    miss_tiff_lst = []
     for item in items:
         if item not in tiff_dict:
-            raise Exception('TIFF %s IS NOT FOUND IN LOCAL RESOURCE' % item)
+            miss_tiff_lst.append(item)
+            continue
+            # raise Exception('TIFF %s IS NOT FOUND IN LOCAL RESOURCE' % item)
 
         path = tiff_dict[item]
         try:
@@ -30,4 +33,4 @@ def main(file_path):
 
 
 if __name__ == '__main__':
-    main('work_tiff_list')
+    main('work_tiff_list.txt')
