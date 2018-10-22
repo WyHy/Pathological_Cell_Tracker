@@ -3,6 +3,7 @@ from keras.layers import *
 from keras.applications import *
 from keras.preprocessing.image import *
 from keras.backend.tensorflow_backend import set_session
+import tensorflow as tf
 
 import os
 import sys
