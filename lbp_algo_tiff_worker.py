@@ -84,7 +84,7 @@ class PCK:
             #################################### YOLO 处理 #####################################################
             # 任务切分
             n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-            patches = [patches[i: i + n] for i in range(0, len(patches), n)]
+            patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
 
             tasks = []
 
