@@ -2,6 +2,8 @@ from keras.models import *
 from keras.layers import *
 from keras.applications import *
 from keras.preprocessing.image import *
+from keras.backend.tensorflow_backend import set_session
+
 import os
 import sys
 import math
@@ -15,6 +17,10 @@ class XceptionPredict:
 
     def __init__(self, gpu="0"):
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+        config = tf.ConfigProto()
+        config.gpu_options.per_process_gpu_memory_fraction = 0.5
+        #config.gpu_options = tf.GPUOptions(allow_growth=True)
+        set_session(tf.Session(config=config))
 
         weights_file = cfg.xception.weights_file
 
@@ -28,7 +34,7 @@ class XceptionPredict:
         self.model = Model(inputs=base_model.input, outputs=predictions)
         self.model.load_weights(weights_file)
 
-    def predict(self, cell_np, batch_size=20):
+    def predict(self, cell_np, batch_size=32):
         predictions = []
         batches = math.ceil(len(cell_np)/batch_size)
 
