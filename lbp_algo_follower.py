@@ -1,17 +1,19 @@
 import datetime
 import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
+
 import numpy as np
 
 from common.utils import FilesScanner
-from utils import get_processed_lst
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
+from utils import get_processed_lst
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
+
 
 def yolo_predict(gpu_index, images_lst):
     """
@@ -79,7 +81,6 @@ class PCK:
                 for key, lst in tiff_dict.items():
                     o.write('%s\t%s\n' % (key, '|'.join(lst)))
 
-
         keys = list(tiff_dict.keys())
         total = len(keys)
 
@@ -90,7 +91,6 @@ class PCK:
         clas_files_path = '/home/tsimage/Development/DATA/meta'
         # cell_images_path = '/home/tsimage/Development/DATA/cells'
         cell_images_path = '/home/tsimage/Development/DATA/cells'
-
 
         already_processed = get_processed_lst(clas_files_path, cell_images_path)
 
