@@ -120,20 +120,25 @@ class PCK:
             cell_lst, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
 
             ##################################### XCEPTION 处理 #################################################
-            # 任务切分
-            n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
-            cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
-
             tasks = []
             # 创建切图进程池
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-            for gpu_index, patch in enumerate(cell_patches):
-                tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
 
-            predictions = []
-            for future in as_completed(tasks):
-                result = future.result()
-                predictions.extend(result)
+            if len(tif_images) < 8:
+                tasks.append(executor.submit(xception_predict, '0', np.asarray(patch)))
+            else:
+                # 任务切分
+                n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
+                cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
+
+                
+                for gpu_index, patch in enumerate(cell_patches):
+                    tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
+
+                predictions = []
+                for future in as_completed(tasks):
+                    result = future.result()
+                    predictions.extend(result)
 
             # 关闭进程池
             executor.shutdown(wait=True)
