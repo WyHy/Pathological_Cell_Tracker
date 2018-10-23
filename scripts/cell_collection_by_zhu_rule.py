@@ -114,7 +114,7 @@ if __name__ == '__main__':
                 else:
                     path = point['path']
                     cell_type = point['type']
-                    cell_save_path = os.path.join(merge_dir_path, key, 'new', cell_type)
+                    cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'new')
                     if not os.path.exists(cell_save_path):
                         os.makedirs(cell_save_path)
 

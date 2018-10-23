@@ -37,7 +37,7 @@ __C.darknet.cfg_file = os.path.join(curr_path, "models/darknet/yolov3-minitest-1
 __C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_final.weights")
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-12-1009.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.names")
-__C.darknet.thresh = 0.05
+__C.darknet.thresh = 0.1
 __C.darknet.hier_thresh = 0.5
 __C.darknet.nms = 0.45
 
