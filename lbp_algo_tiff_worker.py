@@ -87,16 +87,20 @@ class PCK:
 
             if not os.path.exists(seg_csv):
                 #################################### YOLO 处理 #####################################################
-                # 任务切分
-                n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-                patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
-
                 tasks = []
 
                 # 创建切图进程池
                 executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-                for gpu_index, patch in enumerate(patches):
-                    tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
+
+                if len(tif_images) < 8:
+                    tasks.append(executor.submit(yolo_predict, str(gpu_index), tif_images))
+                else:
+                    # 任务切分
+                    n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
+                    patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
+
+                    for gpu_index, patch in enumerate(patches):
+                        tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
 
                 seg_results = {}
                 for future in as_completed(tasks):
