@@ -33,7 +33,7 @@ def xception_predict(gpu_index, images_numpy):
     :param images_numpy: image numpy_array
     :return:
     """
-    return XceptionPredict(str(gpu_index)).predict(images_numpy)
+    return gpu_index, XceptionPredict(str(gpu_index)).predict(images_numpy)
 
 
 class PCK:
@@ -130,15 +130,18 @@ class PCK:
                 # 任务切分
                 n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
                 cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
-
                 
                 for gpu_index, patch in enumerate(cell_patches):
                     tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
 
-            predictions = []
+            predictions_ = {}
             for future in as_completed(tasks):
-                result = future.result()
-                predictions.extend(result)
+                index, result = future.result()
+                predictions_[index] = result
+
+            predictions = []
+            for i in range(len(predictions_)):
+                predictions.extend(predictions_[str(i)])
 
             # 关闭进程池
             executor.shutdown(wait=True)
