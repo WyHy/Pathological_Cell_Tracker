@@ -19,7 +19,7 @@ def get_coordinate(point_path_lst):
             print(basename)
             exit()
 
-        _, x, y, w, h = point
+        _, x, y, w, h, _ = point
         lst.append((x, y, w, h))
 
     return lst
