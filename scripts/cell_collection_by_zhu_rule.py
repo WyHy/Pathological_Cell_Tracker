@@ -82,7 +82,7 @@ if __name__ == '__main__':
             for item in auto_point_lst:
                 path = item['path']
                 cell_type = item['type']
-                cell_save_path = os.path.join(merge_dir_path, key, 'new', cell_type)
+                cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'new')
                 if not os.path.exists(cell_save_path):
                     os.makedirs(cell_save_path)
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                 path = item['path']
                 cell_type = item['type']
 
-                cell_save_path = os.path.join(merge_dir_path, key, 'check', cell_type)
+                cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'check')
                 if not os.path.exists(cell_save_path):
                     os.makedirs(cell_save_path)
 
