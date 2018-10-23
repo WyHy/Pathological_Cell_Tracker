@@ -118,7 +118,7 @@ class PCK:
             ##################################### XCEPTION 处理 #################################################
             # 任务切分
             n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
-            cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_index), n)]
+            cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
 
             tasks = []
             # 创建切图进程池
@@ -153,7 +153,7 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = False
+    test = True
 
     t0 = datetime.datetime.now()
 
