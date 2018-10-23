@@ -70,7 +70,7 @@ if __name__ == '__main__':
     print('COMPARE AND COPY CELL IMAGE TO DST ...')
     keys = list(auto_children_dict.keys())
     total = len(keys)
-    for index, key in keys:
+    for index, key in enumerate(keys):
         print("%s / %s %s ... " % (index + 1, total, key))
         auto_point_lst = auto_children_dict[key]
         if key not in manual_children_dict:
