@@ -14,7 +14,12 @@ def get_coordinate(point_path_lst):
     lst = []
     for item in point_path_lst:
         basename = os.path.basename(item['path'])
-        _, x, y, w, h = get_location_from_filename(basename)
+        point = get_location_from_filename(basename)
+        if not point:
+            print(basename)
+            exit()
+
+        _, x, y, w, h = point[0]
         lst.append((x, y, w, h))
 
     return lst
