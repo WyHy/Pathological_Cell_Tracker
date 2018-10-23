@@ -135,10 +135,10 @@ class PCK:
                 for gpu_index, patch in enumerate(cell_patches):
                     tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
 
-                predictions = []
-                for future in as_completed(tasks):
-                    result = future.result()
-                    predictions.extend(result)
+            predictions = []
+            for future in as_completed(tasks):
+                result = future.result()
+                predictions.extend(result)
 
             # 关闭进程池
             executor.shutdown(wait=True)
