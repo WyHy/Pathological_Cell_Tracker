@@ -71,8 +71,9 @@ class DarknetPredict:
                             pass
                         else:
                             unique_point_collection[index] = (label, accuracy, (x_center, y_center, w, h))
+                            print(boxes_new[index])
                             boxes_new[index] = box
-                            
+                            print(boxes_new[index])
                         break
                 else:
                     unique_point_collection.append((label, accuracy, (x, y, w, h)))
