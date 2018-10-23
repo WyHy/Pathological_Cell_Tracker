@@ -61,9 +61,9 @@ if __name__ == '__main__':
 
     print('GENERATE KEY <=> IMAGE_LST DICT ...')
     for key in auto_dict:
-        auto_children_dict[key] = parent_children_lst[auto_dict[key]]
+        auto_children_dict[key] = parent_children_lst(auto_dict[key])
         if key not in manual_dict:
-            manual_children_dict[key] = parent_children_lst[manual_dict[key]]
+            manual_children_dict[key] = parent_children_lst(manual_dict[key])
 
     print('COMPARE AND COPY CELL IMAGE TO DST ...')
     keys = list(auto_children_dict.keys())
