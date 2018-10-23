@@ -51,17 +51,26 @@ if __name__ == '__main__':
     manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_CHECKED'
     merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_MERGED'
 
+    print('GENERATE AUTO IMAGE DICT ...')
     auto_dict = get_parent_list(auto_dir_path)
+    print('GENERATE MANUAL IMAGE DICT ...')
     manual_dict = get_parent_list(manual_dir_path)
 
     auto_children_dict = {}
     manual_children_dict = {}
+
+    print('GENERATE KEY <=> IMAGE_LST DICT ...')
     for key in auto_dict:
         auto_children_dict[key] = parent_children_lst[auto_dict[key]]
         if key not in manual_dict:
             manual_children_dict[key] = parent_children_lst[manual_dict[key]]
 
-    for key, auto_point_lst in auto_children_dict.items():
+    print('COMPARE AND COPY CELL IMAGE TO DST ...')
+    keys = list(auto_children_dict.keys())
+    total = len(keys)
+    for index, key in keys:
+        print("%s / %s %s ... " % (index + 1, total, key))
+        auto_point_lst = auto_children_dict[key]
         if key not in manual_children_dict:
             for item in auto_point_lst:
                 path = item['path']
