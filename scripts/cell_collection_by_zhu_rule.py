@@ -104,9 +104,7 @@ if __name__ == '__main__':
             # 检测算法识别细胞的坐标位置，进行重复性判断
             manual_point_coordinate_lst = get_coordinate(manual_point_lst)
             for point in auto_point_lst:
-                print(point)
                 basename = os.path.basename(point['path'])
-                print(basename)
                 _, x, y, w, h, _ = get_location_from_filename(basename)
 
                 # 与审核图像存在重复
