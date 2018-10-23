@@ -1,18 +1,17 @@
 import datetime
 from concurrent.futures import ProcessPoolExecutor, as_completed
-import openslide
+
 import numpy as np
+import openslide
 
 from common.tslide.tslide import TSlide
 from common.utils import ImageSlice
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
-from models.decisionTree.decision_tree_predict import DecisionTreePredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
-from utils import FilesScanner
-from sklearn.externals import joblib
+from utils import FilesScanner, generate_name_path_dict
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
 
@@ -113,10 +112,8 @@ class PCK:
             t2 = datetime.datetime.now()
             print("DARKNET COST %s" % (t2 - t1))
 
-
             # XCEPTION preprocess
             cell_lst, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
-
 
             ##################################### XCEPTION 处理 #################################################
             # 任务切分
@@ -156,12 +153,13 @@ class PCK:
 
 if __name__ == "__main__":
     # wanna test?
-    test = True
+    test = False
 
     t0 = datetime.datetime.now()
 
-    resource_path = '/home/cnn/Development/DATA/RESOURCE'
+    # resource_path = '/home/cnn/Development/DATA/RESOURCE'
     # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
+    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022'
 
     if test:
         # TIFF 图像存储路径
@@ -188,8 +186,18 @@ if __name__ == "__main__":
         # 识别出的细胞存储路径
         cells_save_path = os.path.join(resource_path, 'CELLS')
 
-    # 获取 TIFF 图像文件地址列表
-    tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
+    # # 获取 TIFF 图像文件地址列表
+    # tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
+
+    tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS'
+    tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb'])
+
+    tiff_lst = []
+    need_process_file_path = 'work_tiff_list.txt'
+    with open(need_process_file_path) as f:
+        lines = f.readlines()
+        items = [line.replace('\n', '') for line in lines]
+        tiff_lst.extend([tiff_dict[item] for item in items])
 
     # 执行 TIFF 文件完整性校验
     for tiff in tiff_lst:
@@ -204,6 +212,7 @@ if __name__ == "__main__":
     for item in [slice_dir_path, meta_files_path, cells_save_path]:
         if not os.path.exists(item):
             os.makedirs(item)
+
     PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
 
     t1 = datetime.datetime.now()
