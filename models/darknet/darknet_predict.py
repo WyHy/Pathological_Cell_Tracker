@@ -37,6 +37,24 @@ class DarknetPredict:
                 f.write("%s = %s\n" % (key, value))
 
     def predict(self, images):
+        # def rm_duplicates(boxes):
+        #     boxes_new = []
+
+        #     unique_point_collection = []
+        #     for box in boxes:
+        #         label, accuracy, (x_center, y_center, w, h) = box
+        #         x = int(x_center - w / 2)
+        #         y = int(y_center - h / 2)
+
+        #         for item in unique_point_collection:
+        #             ratio = cal_IOU(item[1], (x, y, w, h))
+        #             if ratio > 0.8 and label == item[0]:
+        #                 break
+        #         else:
+        #             unique_point_collection.append((label, (x, y, w, h)))
+        #             boxes_new.append(box)
+        #     return boxes_new
+
         def rm_duplicates(boxes):
             boxes_new = []
 
@@ -46,14 +64,22 @@ class DarknetPredict:
                 x = int(x_center - w / 2)
                 y = int(y_center - h / 2)
 
-                for item in unique_point_collection:
-                    ratio = cal_IOU(item[1], (x, y, w, h))
-                    if ratio > 0.8 and label == item[0]:
+                for index, item in enumerate(unique_point_collection):
+                    ratio = cal_IOU(item[2], (x, y, w, h))
+                    if ratio > 0.8:
+                        if item[1] > accuracy:
+                            pass
+                        else:
+                            unique_point_collection[index] = (label, accuracy, (x_center, y_center, w, h))
+                            boxes_new[index] = box
+                            
                         break
                 else:
-                    unique_point_collection.append((label, (x, y, w, h)))
+                    unique_point_collection.append((label, accuracy, (x, y, w, h)))
                     boxes_new.append(box)
             return boxes_new
+
+
 
         results = {}
 
@@ -72,6 +98,7 @@ class DarknetPredict:
             results_new[x_y] = []
             boxes = rm_duplicates(boxes)
             for box in boxes:
+
                 box_new = [box[0],
                            box[1],
                            [box[2][0] - box[2][2] / 2,
