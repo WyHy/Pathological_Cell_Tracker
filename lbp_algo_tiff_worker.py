@@ -92,7 +92,7 @@ class PCK:
                 # 创建切图进程池
                 executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
-                if len(tif_images) < 8:
+                if len(tif_images) < cfg.darknet.min_job_length:
                     tasks.append(executor.submit(yolo_predict, '0', tif_images))
                 else:
                     # 任务切分
@@ -124,7 +124,7 @@ class PCK:
             # 创建切图进程池
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
-            if len(tif_images) < 8:
+            if len(tif_images) < cfg.xception.min_job_length:
                 tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
             else:
                 # 任务切分

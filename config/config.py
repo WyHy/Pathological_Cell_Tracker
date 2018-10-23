@@ -40,6 +40,7 @@ __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.n
 __C.darknet.thresh = 0.1
 __C.darknet.hier_thresh = 0.5
 __C.darknet.nms = 0.45
+__C.darknet.min_job_length = 8
 
 #
 # xception param for 16 classes
@@ -58,6 +59,7 @@ __C.xception.class_num = 16
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 # __C.xception.class_num = 18
 __C.xception.det2 = 0.1   # used in gen output csv file
+__C.xception.min_job_length = 80000
 
 
 # decision tree
