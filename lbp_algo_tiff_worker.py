@@ -93,7 +93,7 @@ class PCK:
                 executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
                 if len(tif_images) < 8:
-                    tasks.append(executor.submit(yolo_predict, str(gpu_index), tif_images))
+                    tasks.append(executor.submit(yolo_predict, '0', tif_images))
                 else:
                     # 任务切分
                     n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
