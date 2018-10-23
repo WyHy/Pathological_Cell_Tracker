@@ -21,14 +21,14 @@ def get_coordinate(point_path_lst):
 
 
 def parent_children_lst(parent_path):
-    lst = generate_name_path_dict(parent_path, ['.jpg'])
+    dict_ = generate_name_path_dict(parent_path, ['.jpg'])
 
     lst_ = []
-    for item in lst:
-        parent = os.path.dirname(item)
+    for key, path in dict_.items():
+        parent = os.path.dirname(path)
         cell_type = os.path.basename(parent)
         lst_.append({
-            'path': item,
+            'path': path,
             'type': cell_type
         })
 
