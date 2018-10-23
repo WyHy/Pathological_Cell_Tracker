@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import re
 
 
 def get_path_postfix(filename):
@@ -187,6 +188,36 @@ def load_classes(path):
     with open(path) as f:
         lines = f.readlines()
         return [line.replace('\n', '') for line in lines]
+
+
+def get_location_from_filename(filename_string):
+    """
+    通过正则表达式从文件名中解析细胞在大图位置
+    :param filename_string: 细胞图像文件名
+    :return: (image_name, x, y, w, h)
+    """
+    name = filename_string.replace(' - 副本', '').replace(' ', '').encode('utf-8').decode('utf-8')
+
+    # 1-p0.0000_markedAs_ASCH_2017-10-27-16_12_50_x9659_y28027_w616_h331.jpg
+    # 1-p0.0000_markedAs_CC_2018-03-27-23_18_27_x5675_y23431_w230_h207_4x.jpg
+    # 1-p0.0000_markedAs_ACTINO_2018-06-20_18_37_06_x34602_y10123_w145_h172_2x.jpg
+    pattern00 = re.compile(r'.*?_markedAs_.*?_(\d+\-\d+\-\d+[\-_]\d+_\d+_\d+)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_?(\dx)?.jpg')
+
+    # 1-p0.0000_2017-11-24-13_16_54_x6626_y35845_w150_h79_4x.jpg
+    # 1-p0.0001_2017-10-09-17_12_28_x19230_y29594_w370_h910_.jpg
+    # m1_2018-04-04-17_50_08_x11194_y33583_w163_h112.jpg
+    # m1_2018-06-20_18_37_06_x10880_y42947_w113_h122.jpg
+    pattern01 = re.compile(r'.*?_(\d+\-\d+\-\d+[\-_]\d+_\d+_\d+)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_?(\dx)?.jpg')
+
+    if '_markedAs' in name:
+        point = re.findall(pattern00, name)
+    else:
+        point = re.findall(pattern01, name)
+
+    if point:
+        return point[0]
+    else:
+        return None
 
 
 if __name__ == '__main__':
