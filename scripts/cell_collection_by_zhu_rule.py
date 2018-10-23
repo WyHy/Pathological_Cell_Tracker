@@ -53,8 +53,10 @@ if __name__ == '__main__':
 
     print('GENERATE AUTO IMAGE DICT ...')
     auto_dict = get_parent_list(auto_dir_path)
+    print('AUTO DICT LENGTH = %s' % len(auto_dict))
     print('GENERATE MANUAL IMAGE DICT ...')
     manual_dict = get_parent_list(manual_dir_path)
+    print('MANUAL DICT LENGTH = %s' % len(manual_dict))
 
     auto_children_dict = {}
     manual_children_dict = {}
@@ -62,7 +64,7 @@ if __name__ == '__main__':
     print('GENERATE KEY <=> IMAGE_LST DICT ...')
     for key in auto_dict:
         auto_children_dict[key] = parent_children_lst(auto_dict[key])
-        if key not in manual_dict:
+        if key in manual_dict:
             manual_children_dict[key] = parent_children_lst(manual_dict[key])
 
     print('COMPARE AND COPY CELL IMAGE TO DST ...')
