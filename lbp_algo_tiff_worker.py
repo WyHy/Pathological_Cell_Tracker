@@ -125,7 +125,7 @@ class PCK:
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
             if len(tif_images) < 8:
-                tasks.append(executor.submit(xception_predict, '0', np.asarray(patch)))
+                tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
             else:
                 # 任务切分
                 n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
