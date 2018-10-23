@@ -1,5 +1,8 @@
 import os
 import re
+import sys
+
+sys.path.append('..')
 
 from utils import generate_name_path_dict
 
