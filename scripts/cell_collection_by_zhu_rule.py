@@ -107,7 +107,7 @@ if __name__ == '__main__':
                 print(point)
                 basename = os.path.basename(point['path'])
                 print(basename)
-                _, x, y, w, h = get_location_from_filename(basename)
+                _, x, y, w, h, _ = get_location_from_filename(basename)
 
                 # 与审核图像存在重复
                 for item in manual_point_coordinate_lst:
