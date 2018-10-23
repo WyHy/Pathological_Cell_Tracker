@@ -210,7 +210,8 @@ def get_location_from_filename(filename_string):
     pattern01 = re.compile(r'.*?_(\d+\-\d+\-\d+[\-_]\d+_\d+_\d+)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_?(\dx)?.jpg')
 
     # 1-p0.0000_TC17033982_x21065_y14444_w56_h49_.jpg
-    pattern02 = re.compile(r'.*?_([A-Z]+\+)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_.jpg')
+    # 1-p0.0987_TC17013562_x28691_y23628_w64_h61_.jpg
+    pattern02 = re.compile(r'.*?_([A-Z]+\d+)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_.jpg')
 
     if '_markedAs' in name:
         point = re.findall(pattern00, name)
