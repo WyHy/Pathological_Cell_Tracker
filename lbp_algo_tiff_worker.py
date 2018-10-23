@@ -120,7 +120,7 @@ class PCK:
 
             ##################################### XCEPTION 处理 #################################################
             # 任务切分
-            n = int((len(cell_index) / float(GPU_NUM)) + 0.5)
+            n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
             cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_index), n)]
 
             tasks = []
@@ -149,7 +149,7 @@ class PCK:
             # GET VIEW CELL IMAGES
             clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
             t4 = datetime.datetime.now()
-            print("GET VIEW IMAGES COST %s" % (t4 - t2))
+            print("GET VIEW IMAGES COST %s" % (t4 - t3))
 
             print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
 

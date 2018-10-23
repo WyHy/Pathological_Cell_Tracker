@@ -179,7 +179,8 @@ class XceptionPreprocess:
                     index += 1
 
         slide.close()
-        return np.asarray(cell_list), cell_index
+        # return np.asarray(cell_list), cell_index
+        return cell_list, cell_index
 
     def gen_np_array_csv_(self, seg_csv, classes=cfg.darknet.classes, det=cfg.xception.det1, size=cfg.xception.size):
         seg_dict = self.read_csv(seg_csv)

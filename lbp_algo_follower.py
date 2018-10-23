@@ -1,5 +1,7 @@
 import datetime
 import re
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import numpy as np
 
 from common.utils import FilesScanner
 from utils import get_processed_lst
@@ -8,6 +10,27 @@ from models.darknet.darknet_predict import DarknetPredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
+
+GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
+
+def yolo_predict(gpu_index, images_lst):
+    """
+    Yolo 检测细胞位置
+    :param gpu_index: gpu id
+    :param images_lst: image 路径列表
+    :return: dict: <x_y: [label, accuracy, xmin, ymin, xmax, ymax]>
+    """
+    return DarknetPredict(str(gpu_index)).predict(images_lst)
+
+
+def xception_predict(gpu_index, images_numpy):
+    """
+    Xception 识别细胞病理分类
+    :param gpu_index: gpu id
+    :param images_numpy: image numpy_array
+    :return:
+    """
+    return XceptionPredict(str(gpu_index)).predict(images_numpy)
 
 
 class PCK:
@@ -56,13 +79,6 @@ class PCK:
                 for key, lst in tiff_dict.items():
                     o.write('%s\t%s\n' % (key, '|'.join(lst)))
 
-        # Yolo 初始化
-        darknet_model = DarknetPredict()
-
-        # Xception 初始化
-        xception_model = XceptionPredict()
-
-        print("MODEL INITIAL DONE...")
 
         keys = list(tiff_dict.keys())
         total = len(keys)
@@ -70,8 +86,11 @@ class PCK:
         failed_tiff_lst = []
 
         # get which processed
+        # clas_files_path = '/home/tsimage/Development/DATA/meta'
         clas_files_path = '/home/tsimage/Development/DATA/meta'
+        # cell_images_path = '/home/tsimage/Development/DATA/cells'
         cell_images_path = '/home/tsimage/Development/DATA/cells'
+
 
         already_processed = get_processed_lst(clas_files_path, cell_images_path)
 
@@ -89,8 +108,27 @@ class PCK:
                 images_lst = tiff_dict[tiff_name]
 
                 t0 = datetime.datetime.now()
-                # 执行 Yolo 细胞分割
-                seg_results = darknet_model.predict(images_lst)
+
+                #################################### YOLO 处理 #####################################################
+                # 任务切分
+                n = int((len(images_lst) / float(GPU_NUM)) + 0.5)
+                patches = [images_lst[i: i + n] for i in range(0, len(images_lst), n)]
+
+                tasks = []
+
+                # 创建切图进程池
+                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                for gpu_index, patch in enumerate(patches):
+                    tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
+
+                seg_results = {}
+                for future in as_completed(tasks):
+                    result = future.result()
+                    seg_results.update(result)
+
+                # 关闭进程池
+                executor.shutdown(wait=True)
+
                 t1 = datetime.datetime.now()
                 print("DARKNET COST %s" % (t1 - t0))
 
@@ -100,10 +138,27 @@ class PCK:
                 xcep_pre.write_csv(seg_results, seg_csv)
 
                 # generate numpy array, it is the input of second stage classification algorithm
-                cell_numpy, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
+                cell_lst, cell_index = xcep_pre.gen_np_array_csv_(seg_csv=seg_csv)
 
-                # 执行细胞分类
-                predictions = xception_model.predict(cell_numpy)
+                ##################################### XCEPTION 处理 #################################################
+                # 任务切分
+                n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
+                cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_index), n)]
+
+                tasks = []
+                # 创建切图进程池
+                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                for gpu_index, patch in enumerate(cell_patches):
+                    tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
+
+                predictions = []
+                for future in as_completed(tasks):
+                    result = future.result()
+                    predictions.extend(result)
+
+                # 关闭进程池
+                executor.shutdown(wait=True)
+
                 t2 = datetime.datetime.now()
                 print("XCEPTION COST %s" % (t2 - t1))
 
