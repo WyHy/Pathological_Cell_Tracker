@@ -1,18 +1,16 @@
 import datetime
-from concurrent.futures import ProcessPoolExecutor, as_completed
-import openslide
+
 import numpy as np
+import openslide
 
 from common.tslide.tslide import TSlide
 from common.utils import ImageSlice
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
-from models.decisionTree.decision_tree_predict import DecisionTreePredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
 from utils import FilesScanner
-from sklearn.externals import joblib
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
 
@@ -59,105 +57,55 @@ class PCK:
     def run(self):
         print("Initial DARKNET and XCEPTION model ...")
 
-        darknet_models = []
-        xception_models = []
-        for gpu_index in range(GPU_NUM):
-            darknet_models.append(DarknetPredict(str(gpu_index)))
-            xception_models.append(XceptionPredict(str(gpu_index)))
+        total = len(self.tiff_lst)
+        for index, tiff in enumerate(self.tiff_lst):
+            # 获取大图文件名，不带后缀
+            tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
+            tiff_basename = tiff_basename.replace(" ", "_")
+            print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
-        # total = len(self.tiff_lst)
-        # for index, tiff in enumerate(self.tiff_lst):
-        #     # 获取大图文件名，不带后缀
-        #     tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
-        #     tiff_basename = tiff_basename.replace(" ", "_")
-        #     print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
+            # 切片文件存储路径
+            slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
 
-        #     # 切片文件存储路径
-        #     slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
+            t0 = datetime.datetime.now()
+            # 如果路径下切图文件不存在，执行切图
+            if not os.path.exists(slice_save_path):
+                # 执行切图
+                ImageSlice(tiff, self.slice_dir_path).get_slices()
 
-        #     t0 = datetime.datetime.now()
-        #     # 如果路径下切图文件不存在，执行切图
-        #     if not os.path.exists(slice_save_path):
-        #         # 执行切图
-        #         ImageSlice(tiff, self.slice_dir_path).get_slices()
+            # 获取切图文件路径
+            tif_images = FilesScanner(slice_save_path, ['.jpg']).get_files()
+            t1 = datetime.datetime.now()
+            print('TIFF SLICE COST: %s' % (t1 - t0))
 
-        #     # 获取切图文件路径
-        #     tif_images = FilesScanner(slice_save_path, ['.jpg']).get_files()
-        #     t1 = datetime.datetime.now()
-        #     print('TIFF SLICE COST: %s' % (t1 - t0))
+            seg_results = DarknetPredict().predict(tif_images)
+            t2 = datetime.datetime.now()
+            print('TIFF DARKNET COST: %s' % (t2 - t1))
 
-        #     # CHECK IF ALREADY PROCESSED
-        #     seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
+            # save segment result into csv
+            xcep_pre = XceptionPreprocess(tiff)
+            seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
+            xcep_pre.write_csv(seg_results, seg_csv)
 
-        #     # 将细胞分割结果写入文件
-        #     xcep_pre = XceptionPreprocess(tiff)
+            # generate numpy array, it is the input of second stage classification algorithm
+            cell_numpy, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
 
-        #     if not os.path.exists(seg_csv):
-        #         #################################### YOLO 处理 #####################################################
-        #         # 任务切分
-        #         n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-        #         patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
+            # run classification
+            predictions = XceptionPredict().predict(np.asarray(cell_numpy))
+            t3 = datetime.datetime.now()
+            print('XCEPTION COST: %s' % (t3 - t2))
 
-        #         tasks = []
+            # summarize two stages' result and generate a final csv
+            clas = XceptionPostprocess()
+            clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
+            clas_csv = os.path.join(self.meta_files_path, tiff_basename + "_clas.csv")
+            clas.write_csv(clas_dict, clas_csv)
 
-        #         # 创建切图进程池
-        #         executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-        #         for gpu_index, patch in enumerate(patches):
-        #             tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
-
-        #         seg_results = {}
-        #         for future in as_completed(tasks):
-        #             result = future.result()
-        #             seg_results.update(result)
-
-        #         # 关闭进程池
-        #         executor.shutdown(wait=True)
-
-        #         # WRITE DATA TO CSV
-        #         xcep_pre.write_csv(seg_results, seg_csv)
-
-        #     t2 = datetime.datetime.now()
-        #     print("DARKNET COST %s" % (t2 - t1))
-
-
-        #     # XCEPTION preprocess
-        #     cell_lst, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
-
-
-        #     ##################################### XCEPTION 处理 #################################################
-        #     # 任务切分
-        #     n = int((len(cell_index) / float(GPU_NUM)) + 0.5)
-        #     cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_index), n)]
-
-        #     tasks = []
-        #     # 创建切图进程池
-        #     executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-        #     for gpu_index, patch in enumerate(cell_patches):
-        #         tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
-
-        #     predictions = []
-        #     for future in as_completed(tasks):
-        #         result = future.result()
-        #         predictions.extend(result)
-
-        #     # 关闭进程池
-        #     executor.shutdown(wait=True)
-
-        #     t3 = datetime.datetime.now()
-        #     print("XCEPTION COST %s" % (t3 - t2))
-
-        #     clas = XceptionPostprocess()
-        #     clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-        #     clas_csv = os.path.join(self.meta_files_path, tiff_basename + '_clas.csv')
-        #     clas.write_csv(clas_dict, clas_csv)
-
-        #     ############################### 获取审核图像 ######################################################
-        #     # GET VIEW CELL IMAGES
-        #     clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
-        #     t4 = datetime.datetime.now()
-        #     print("GET VIEW IMAGES COST %s" % (t4 - t3))
-
-        #     print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
+            ############################### 获取审核图像 ######################################################
+            # GET VIEW CELL IMAGES
+            clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
+            t4 = datetime.datetime.now()
+            print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
 
 
 if __name__ == "__main__":
@@ -168,6 +116,7 @@ if __name__ == "__main__":
 
     resource_path = '/home/cnn/Development/DATA/RESOURCE'
     # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
+    # resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022'
 
     if test:
         # TIFF 图像存储路径
@@ -194,8 +143,18 @@ if __name__ == "__main__":
         # 识别出的细胞存储路径
         cells_save_path = os.path.join(resource_path, 'CELLS')
 
-    # 获取 TIFF 图像文件地址列表
+    # # 获取 TIFF 图像文件地址列表
     tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
+
+    # tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS'
+    # tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb'])
+    #
+    # tiff_lst = []
+    # need_process_file_path = 'work_tiff_list.txt'
+    # with open(need_process_file_path) as f:
+    #     lines = f.readlines()
+    #     items = [line.replace('\n', '') for line in lines]
+    #     tiff_lst.extend([tiff_dict[item] for item in items])
 
     # 执行 TIFF 文件完整性校验
     for tiff in tiff_lst:
@@ -210,6 +169,7 @@ if __name__ == "__main__":
     for item in [slice_dir_path, meta_files_path, cells_save_path]:
         if not os.path.exists(item):
             os.makedirs(item)
+
     PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
 
     t1 = datetime.datetime.now()
