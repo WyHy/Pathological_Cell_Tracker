@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import sys
@@ -8,6 +9,18 @@ sys.path.append('..')
 from utils import generate_name_path_dict, get_location_from_filename, cal_IOU
 
 pattern = re.compile(r'(.*?)([A-Z]{2}\d{8})')
+
+
+def load_dict(file_path):
+    with open(file_path) as f:
+        lines = f.readlines()
+
+        dict_ = {}
+        for line in lines:
+            key, value = line.replace('\n', '').split('\t')
+            dict_[key] = json.loads(value)
+
+        return dict_
 
 
 def get_coordinate(point_path_lst):
@@ -72,52 +85,55 @@ if __name__ == '__main__':
         if key in manual_dict:
             manual_children_dict[key] = parent_children_lst(manual_dict[key])
 
+    DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
+
     print('COMPARE AND COPY CELL IMAGE TO DST ...')
     keys = list(auto_children_dict.keys())
     total = len(keys)
     for index, key in enumerate(keys):
         print("%s / %s %s ... " % (index + 1, total, key))
-        auto_point_lst = auto_children_dict[key]
-        if key not in manual_children_dict:
-            for item in auto_point_lst:
-                path = item['path']
-                cell_type = item['type']
-                cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
-                if not os.path.exists(cell_save_path):
-                    os.makedirs(cell_save_path)
-
-                # 该图像不存在审核文件，直接拷贝图像至目标文件夹
-                shutil.copy(path, cell_save_path)
-        else:
-            manual_point_lst = manual_children_dict[key]
-            # 创建审核过的细胞存放路径
-            for item in manual_point_lst:
-                path = item['path']
-                cell_type = item['type']
-
-                cell_save_path = os.path.join(merge_dir_path, key, cell_type)
-                if not os.path.exists(cell_save_path):
-                    os.makedirs(cell_save_path)
-
-                shutil.copy(path, cell_save_path)
-
-            # 检测算法识别细胞的坐标位置，进行重复性判断
-            manual_point_coordinate_lst = get_coordinate(manual_point_lst)
-            for point in auto_point_lst:
-                basename = os.path.basename(point['path'])
-                _, x, y, w, h, _ = get_location_from_filename(basename)
-
-                # 与审核图像存在重复
-                for item in manual_point_coordinate_lst:
-                    if cal_IOU((x, y, w, h), item) > 0.8:
-                        break
-                else:
-                    path = point['path']
-                    cell_type = point['type']
-                    cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
-                    if not os.path.exists(cell_save_path):
-                        os.makedirs(cell_save_path)
-
-                    # 该图像不存在对应审核图像，直接拷贝图像至目标文件夹
-                    shutil.copy(path, cell_save_path)
+        print(DIAGNOSE_RESULT[key])
+        # auto_point_lst = auto_children_dict[key]
+        # if key not in manual_children_dict:
+        #     for item in auto_point_lst:
+        #         path = item['path']
+        #         cell_type = item['type']
+        #         cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
+        #         if not os.path.exists(cell_save_path):
+        #             os.makedirs(cell_save_path)
+        #
+        #         # 该图像不存在审核文件，直接拷贝图像至目标文件夹
+        #         shutil.copy(path, cell_save_path)
+        # else:
+        #     manual_point_lst = manual_children_dict[key]
+        #     # 创建审核过的细胞存放路径
+        #     for item in manual_point_lst:
+        #         path = item['path']
+        #         cell_type = item['type']
+        #
+        #         cell_save_path = os.path.join(merge_dir_path, key, cell_type)
+        #         if not os.path.exists(cell_save_path):
+        #             os.makedirs(cell_save_path)
+        #
+        #         shutil.copy(path, cell_save_path)
+        #
+        #     # 检测算法识别细胞的坐标位置，进行重复性判断
+        #     manual_point_coordinate_lst = get_coordinate(manual_point_lst)
+        #     for point in auto_point_lst:
+        #         basename = os.path.basename(point['path'])
+        #         _, x, y, w, h, _ = get_location_from_filename(basename)
+        #
+        #         # 与审核图像存在重复
+        #         for item in manual_point_coordinate_lst:
+        #             if cal_IOU((x, y, w, h), item) > 0.8:
+        #                 break
+        #         else:
+        #             path = point['path']
+        #             cell_type = point['type']
+        #             cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
+        #             if not os.path.exists(cell_save_path):
+        #                 os.makedirs(cell_save_path)
+        #
+        #             # 该图像不存在对应审核图像，直接拷贝图像至目标文件夹
+        #             shutil.copy(path, cell_save_path)
 
