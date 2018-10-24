@@ -52,7 +52,7 @@ def get_parent_list(parent_dir_path):
 
 
 if __name__ == '__main__':
-    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS'
+    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_READY_TO_CHECK'
     manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_CHECKED'
     merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_MERGED'
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
             for item in auto_point_lst:
                 path = item['path']
                 cell_type = item['type']
-                cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'new')
+                cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
                 if not os.path.exists(cell_save_path):
                     os.makedirs(cell_save_path)
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                 path = item['path']
                 cell_type = item['type']
 
-                cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'check')
+                cell_save_path = os.path.join(merge_dir_path, key, cell_type)
                 if not os.path.exists(cell_save_path):
                     os.makedirs(cell_save_path)
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
                 else:
                     path = point['path']
                     cell_type = point['type']
-                    cell_save_path = os.path.join(merge_dir_path, key, cell_type, 'new')
+                    cell_save_path = os.path.join(merge_dir_path, key, cell_type + '_NEW')
                     if not os.path.exists(cell_save_path):
                         os.makedirs(cell_save_path)
 
