@@ -65,6 +65,9 @@ def get_parent_list(parent_dir_path):
 
 
 if __name__ == '__main__':
+    DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
+    exit()
+    
     auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_READY_TO_CHECK'
     manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_CHECKED'
     merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_MERGED'
@@ -92,7 +95,8 @@ if __name__ == '__main__':
     total = len(keys)
     for index, key in enumerate(keys):
         print("%s / %s %s ... " % (index + 1, total, key))
-        print(DIAGNOSE_RESULT[key])
+        if key in DIAGNOSE_RESULT:
+            print(DIAGNOSE_RESULT[key.encode('utf-8')])
         # auto_point_lst = auto_children_dict[key]
         # if key not in manual_children_dict:
         #     for item in auto_point_lst:
