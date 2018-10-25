@@ -68,15 +68,9 @@ if __name__ == '__main__':
     DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
     exit()
     
-    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_READY_TO_CHECK'
-    manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_CHECKED'
-    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022/CELLS/TIFFS_MERGED'
-    
-"""
-    auto_dir_path = 'C:/Development/data/TIFFS_READY_TO_CHECK'
-    manual_dir_path = 'C:/Development/data/TIFFS_CHECKED'
-    merge_dir_path = 'C:/Development/data/TIFFS_MERGED'
-"""
+    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_READY_TO_CHECK'
+    manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_CHECKED'
+    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_MERGED'
 
     print('GENERATE AUTO IMAGE DICT ...')
     auto_dict = get_parent_list(auto_dir_path)
