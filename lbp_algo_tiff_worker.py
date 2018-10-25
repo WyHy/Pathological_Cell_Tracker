@@ -171,7 +171,11 @@ if __name__ == "__main__":
 
     # resource_path = '/home/cnn/Development/DATA/RESOURCE'
     # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
-    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181022'
+
+    flag = "20181025_1"
+    need_process_file_path = 'work_tiff_list_01.txt'
+
+    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s' % flag
 
     if test:
         # TIFF 图像存储路径
@@ -205,7 +209,7 @@ if __name__ == "__main__":
     tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb'])
     
     tiff_lst = []
-    need_process_file_path = 'work_tiff_list.txt'
+
     with open(need_process_file_path) as f:
         lines = f.readlines()
         items = [line.replace('\n', '') for line in lines]
