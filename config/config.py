@@ -40,7 +40,11 @@ __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.n
 __C.darknet.thresh = 0.1
 __C.darknet.hier_thresh = 0.5
 __C.darknet.nms = 0.45
-__C.darknet.min_job_length = 8
+# 启动多进程任务的最低图像数
+__C.darknet.min_job_length = 16
+# 依据坐标位置判断两个图像是否重复时的最低重叠比
+__C.darknet.min_overlap_ratio = 0.6
+
 
 #
 # xception param for 16 classes
@@ -59,7 +63,8 @@ __C.xception.class_num = 16
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 # __C.xception.class_num = 18
 __C.xception.det2 = 0.1   # used in gen output csv file
-__C.xception.min_job_length = 80000
+__C.xception.min_job_length = 16
+__C.xception.min_overlap_ratio = 0.6
 
 
 # decision tree

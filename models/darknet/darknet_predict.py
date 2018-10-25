@@ -66,7 +66,7 @@ class DarknetPredict:
 
                 for index, item in enumerate(unique_point_collection):
                     ratio = cal_IOU(item[2], (x, y, w, h))
-                    if ratio > 0.8:
+                    if ratio > cfg.darknet.min_overlap_ratio:
                         if item[1] > accuracy:
                             pass
                         else:
