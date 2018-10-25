@@ -7,9 +7,9 @@ sys.path.append('..')
 from utils import generate_name_path_dict
 from common.tslide.tslide import TSlide
 
-TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS'
+TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181025'
 
-REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF/before_20181016"
+REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF"
 
 
 def main(file_path):
@@ -42,4 +42,4 @@ def main(file_path):
 
 
 if __name__ == '__main__':
-    main('work_tiff_list.txt')
+    main('work_tiff_list_01.txt')
