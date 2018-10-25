@@ -45,4 +45,4 @@ def main(file_path):
 
 
 if __name__ == '__main__':
-    main('work_tiff_list_01.txt')
+    main('work_tiff_list_02.txt')
