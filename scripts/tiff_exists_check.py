@@ -21,7 +21,10 @@ def main(file_path):
         items = [line.replace('\n', '') for line in lines]
 
     miss_tiff_lst = []
-    for item in items:
+
+    total = len(items)
+    for index, item in enumerate(items):
+        print("%s / %s" % (index + 1, total))
         if item not in tiff_dict:
             miss_tiff_lst.append(item)
             remote_file_path = remote_tiff_dict[item]
