@@ -9,6 +9,7 @@ sys.path.append('..')
 from utils import generate_name_path_dict, get_location_from_filename, cal_IOU
 
 pattern = re.compile(r'(.*?)([A-Z]{2}\d{8})')
+pattern01 = re.compile(r'(.*?)_?(\d{4}\-\d{2}\-\d{2} \d{2}_\d{2}_\d{2})')
 
 
 def load_dict(file_path):
@@ -58,7 +59,8 @@ def get_parent_list(parent_dir_path):
 
     dict_ = {}
     for item in lst:
-        prefix, name = re.findall(pattern, item)[0]
+        name, _ = os.path.splitext(item)
+        # prefix, name = re.findall(pattern, item)[0]
         dict_[name] = os.path.join(parent_dir_path, item)
 
     return dict_
@@ -68,9 +70,9 @@ if __name__ == '__main__':
     # DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
     # exit()
     
-    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_READY_TO_CHECK'
+    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026/CELLS/20181025_1'
     manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_CHECKED'
-    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_MERGED'
+    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026/CELLS/TIFFS_MERGED_20181026'
 
     print('GENERATE AUTO IMAGE DICT ...')
     auto_dict = get_parent_list(auto_dir_path)

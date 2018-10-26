@@ -172,11 +172,12 @@ if __name__ == "__main__":
     # resource_path = '/home/cnn/Development/DATA/RESOURCE'
     # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
 
-    flag = "20181025_1"
-    need_process_file_path = 'work_tiff_list_01.txt'
+    # flag = "20181026"
+    # need_process_file_path = 'work_tiff_list_zhenzhou_3.txt'
 
-    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s' % flag
+    # resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s' % flag
 
+    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026_1'
     if test:
         # TIFF 图像存储路径
         tiff_dir_path = os.path.join(resource_path, 'test', 'TIFF')
@@ -205,15 +206,15 @@ if __name__ == "__main__":
     # # 获取 TIFF 图像文件地址列表
     # tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
 
-    tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181025'
-    tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb'])
+    tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181026'
+    # tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb', '.tif'])
     
-    tiff_lst = []
+    tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
 
-    with open(need_process_file_path) as f:
-        lines = f.readlines()
-        items = [line.replace('\n', '') for line in lines]
-        tiff_lst.extend([tiff_dict[item] for item in items])
+    # with open(need_process_file_path) as f:
+    #     lines = f.readlines()
+    #     items = [line.replace('\n', '').replace(' ', '-') for line in lines]
+    #     tiff_lst.extend([tiff_dict[item] for item in items])
 
     # 执行 TIFF 文件完整性校验
     for tiff in tiff_lst:
