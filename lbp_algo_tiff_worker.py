@@ -65,6 +65,15 @@ class PCK:
             tiff_basename = tiff_basename.replace(" ", "_")
             print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
+            # 检测是否已经切图并识别完成
+            # 检测细胞文件夹是否已经存在，若存在直接跳过
+            check_cell_path = os.path.join(self.cells_path, tiff_basename)
+            children = os.listdir(check_cell_path)
+
+            if os.path.exists(check_cell_path) and len(children) > 0:
+                print("%s HAS BEEN PROCESSED!" % tiff_basename)
+                continue
+
             # 切片文件存储路径
             slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
 
@@ -124,7 +133,7 @@ class PCK:
             # 创建切图进程池
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
-            if len(tif_images) < cfg.xception.min_job_length:
+            if len(cell_lst) < cfg.xception.min_job_length:
                 tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
             else:
                 # 任务切分

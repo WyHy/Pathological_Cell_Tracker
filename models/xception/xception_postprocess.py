@@ -190,9 +190,10 @@ class XceptionPostprocess:
             slide = openslide.OpenSlide(tifname)
         except:
             slide = TSlide(tifname)
-        basename = os.path.splitext(os.path.basename(tifname))[0]
-        parent_d = os.path.basename(os.path.dirname(tifname))
-        save_path = os.path.join(save_path, parent_d, basename)
+        basename = os.path.splitext(os.path.basename(tifname))[0].replace(" ", "_")
+        # parent_d = os.path.basename(os.path.dirname(tifname))
+        # save_path = os.path.join(save_path, parent_d, basename)
+        save_path = os.path.join(save_path, basename)
         marked_boxes = get_labels(os.path.splitext(tifname)[0] + ".xml")
         for x_y, boxes in new_dict.items():
             for box in boxes:
