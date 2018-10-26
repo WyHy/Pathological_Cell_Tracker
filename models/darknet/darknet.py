@@ -2,8 +2,9 @@ from ctypes import *
 import math
 import random
 import os
-
 import sys
+import scipy.misc
+import numpy as np
 
 sys.path.append('../../')
 from config.config import cfg
@@ -25,6 +26,18 @@ def c_array(ctype, values):
     arr[:] = values
     return arr
 
+# add this func to transfer numpy to what format yolo need
+def array_to_image(arr):
+
+    # need to return old values to avoid python freeing memory
+    arr = arr.transpose(2,0,1)
+    c = arr.shape[0]
+    h = arr.shape[1]
+    w = arr.shape[2]
+    arr = np.ascontiguousarray(arr.flat, dtype=np.float32) / 255.0
+    data = arr.ctypes.data_as(POINTER(c_float))
+    im = IMAGE(w,h,c,data)
+    return im, arr
 
 class BOX(Structure):
     _fields_ = [("x", c_float),
@@ -157,14 +170,12 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
-
-def detect_with_rawdata(net, meta, image, image_shape=[608, 608, 3], thresh=.5, hier_thresh=.5, nms=.45):
-    format_image = make_image(608, 608, 3)
-    format_image.data = image
+def detect_numpy(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
+    im, arr = array_to_image(image)
     num = c_int(0)
     pnum = pointer(num)
-    predict_image(net, format_image)
-    dets = get_network_boxes(net, format_image.w, format_image.h, thresh, hier_thresh, None, 0, pnum)
+    predict_image(net, im)
+    dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, None, 0, pnum)
     num = pnum[0]
     if (nms): do_nms_obj(dets, num, meta.classes, nms);
 
@@ -177,7 +188,6 @@ def detect_with_rawdata(net, meta, image, image_shape=[608, 608, 3], thresh=.5, 
     res = sorted(res, key=lambda x: -x[1])
     free_detections(dets, num)
     return res
-
 
 if __name__ == "__main__":
     # net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
