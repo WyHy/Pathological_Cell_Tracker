@@ -43,8 +43,8 @@ def tiff_readable_check(path):
 
 
 def get_and_download(file_path):
-    tiff_dict = generate_name_path_dict(TIFF_FILES_PATH, ['.kfb'])
-    remote_tiff_dict = generate_name_path_dict(REMOTE_TIFF_PATH, ['.kfb'])
+    tiff_dict = generate_name_path_dict(TIFF_FILES_PATH, ['.kfb', '.tif'])
+    remote_tiff_dict = generate_name_path_dict(REMOTE_TIFF_PATH, ['.kfb', '.tif'])
 
     with open(file_path) as f:
         lines = f.readlines()
@@ -76,5 +76,6 @@ def get_and_download(file_path):
 
 if __name__ == '__main__':
     # 检查文件名是否有重复
-    tiff_readable_check(REMOTE_TIFF_PATH)
-    # get_and_download('work_tiff_list_01.txt')
+    # tiff_readable_check(REMOTE_TIFF_PATH)
+
+    get_and_download('work_tiff_list_01.txt')
