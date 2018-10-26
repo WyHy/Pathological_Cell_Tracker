@@ -84,8 +84,8 @@ class DarknetPredict:
 
         for image in images:
             #   results.append(detect_with_rawdata(self.net, self.meta, image, self.thresh, self.hier_thresh, self.nms))
-            results[os.path.splitext(os.path.basename(image))[0]] = detect(self.net, self.meta, image, self.thresh,
-                                                                           self.hier_thresh, self.nms)
+            r = detect(self.net, self.meta, image, self.thresh, self.hier_thresh, self.nms)
+            results[os.path.splitext(os.path.basename(image))[0]] = r
 
         results_new = {}
 

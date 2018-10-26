@@ -7,7 +7,7 @@ sys.path.append('..')
 from common.tslide.tslide import TSlide
 from utils import generate_name_path_dict, FilesScanner
 
-TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181025'
+TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181026'
 
 REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF"
 
@@ -48,7 +48,7 @@ def get_and_download(file_path):
 
     with open(file_path) as f:
         lines = f.readlines()
-        items = [line.replace('\n', '') for line in lines]
+        items = [line.replace('\n', '').replace(' ', '-') for line in lines]
 
     miss_tiff_lst = []
 
@@ -61,7 +61,8 @@ def get_and_download(file_path):
             print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
             shutil.copy(remote_file_path, TIFF_FILES_PATH)
             # raise Exception('TIFF %s IS NOT FOUND IN LOCAL RESOURCE' % item)
-
+        else:
+            print("%s IS ALREADY EXIST!" % item)
         # path = tiff_dict[item]
         # try:
         #     try:
@@ -78,4 +79,4 @@ if __name__ == '__main__':
     # 检查文件名是否有重复
     # tiff_readable_check(REMOTE_TIFF_PATH)
 
-    get_and_download('work_tiff_list_01.txt')
+    get_and_download('work_tiff_list_20181026.txt')
