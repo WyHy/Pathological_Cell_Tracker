@@ -224,7 +224,7 @@ class ImageSlice(object):
             t0 = datetime.datetime.now()
 
             # 获取病理图像文件名，假如文件名中有空格的话，以 "_" 替换
-            img_name = os.path.basename(image).split(".")[0].replace(" ", "_")
+            img_name = os.path.basename(image).split(".")[0].replace(" ", "-")
             print("Image Process %s ..." % image)
 
             try:
@@ -348,8 +348,8 @@ class ImageSliceInMemory(object):
         for image in self.images:
             t0 = datetime.datetime.now()
 
-            # 获取病理图像文件名，假如文件名中有空格的话，以 "_" 替换
-            img_name = os.path.basename(image).split(".")[0].replace(" ", "_")
+            # 获取病理图像文件名，假如文件名中有空格的话，以 "-" 替换
+            img_name = os.path.basename(image).split(".")[0].replace(" ", "-")
             print("Image Process %s ..." % image)
 
             try:

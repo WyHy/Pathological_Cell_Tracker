@@ -19,7 +19,7 @@ def load_dict(file_path):
         dict_ = {}
         for line in lines:
             key, value = line.replace('\n', '').split('\t')
-            dict_[key] = json.loads(value)
+            dict_[key.replace(' ', '-')] = json.loads(value)
 
         return dict_
 
@@ -70,9 +70,9 @@ if __name__ == '__main__':
     # DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
     # exit()
     
-    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026/CELLS/20181025_1'
+    auto_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026_1/CELLS/20181026_1'
     manual_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181024/CELLS/TIFFS_CHECKED'
-    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026/CELLS/TIFFS_MERGED_20181026'
+    merge_dir_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026_1/CELLS/TIFFS_MERGED_20181026_1'
 
     print('GENERATE AUTO IMAGE DICT ...')
     auto_dict = get_parent_list(auto_dir_path)
@@ -87,8 +87,8 @@ if __name__ == '__main__':
     print('GENERATE KEY <=> IMAGE_LST DICT ...')
     for key in auto_dict:
         auto_children_dict[key] = parent_children_lst(auto_dict[key])
-        if key in manual_dict:
-            manual_children_dict[key] = parent_children_lst(manual_dict[key])
+        # if key in manual_dict:
+        #     manual_children_dict[key] = parent_children_lst(manual_dict[key])
 
     DIAGNOSE_RESULT = load_dict('DIAGNOSE_RESULT_DICT.txt')
 

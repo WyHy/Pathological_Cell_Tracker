@@ -194,7 +194,7 @@ def main(file_path, payload, cell_output_path, output_file_path=TEMP_FILES_PATH)
         shutil.rmtree(output_file_path)
 
     # 获取病理图像文件名，假如文件名中有空格的话，以 "_" 替换
-    img_name = os.path.basename(file_path).split(".")[0].replace(" ", "_")
+    img_name = os.path.basename(file_path).split(".")[0].replace(" ", "-")
     print("Image Process %s ..." % file_path)
 
     try:

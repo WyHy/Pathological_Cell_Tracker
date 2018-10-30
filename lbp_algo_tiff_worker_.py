@@ -61,7 +61,7 @@ class PCK:
         for index, tiff in enumerate(self.tiff_lst):
             # 获取大图文件名，不带后缀
             tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
-            tiff_basename = tiff_basename.replace(" ", "_")
+            tiff_basename = tiff_basename.replace(" ", "-")
             print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
             # 切片文件存储路径

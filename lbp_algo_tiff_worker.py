@@ -62,17 +62,18 @@ class PCK:
         for index, tiff in enumerate(self.tiff_lst):
             # 获取大图文件名，不带后缀
             tiff_basename, _ = os.path.splitext(os.path.basename(tiff))
-            tiff_basename = tiff_basename.replace(" ", "_")
+            tiff_basename = tiff_basename.replace(" ", "-")
             print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
             # 检测是否已经切图并识别完成
             # 检测细胞文件夹是否已经存在，若存在直接跳过
             check_cell_path = os.path.join(self.cells_path, tiff_basename)
-            children = os.listdir(check_cell_path)
 
-            if os.path.exists(check_cell_path) and len(children) > 0:
-                print("%s HAS BEEN PROCESSED!" % tiff_basename)
-                continue
+            if os.path.exists(check_cell_path):
+                children = os.listdir(check_cell_path)
+                if len(children) > 0:
+                    print("%s HAS BEEN PROCESSED!" % tiff_basename)
+                    continue
 
             # 切片文件存储路径
             slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
