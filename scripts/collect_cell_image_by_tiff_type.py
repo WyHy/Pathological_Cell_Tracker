@@ -80,10 +80,10 @@ def do_collect_by_tiff_type(path, dict_):
 
                 p_dict_sorted = sorted(p_dict.items(), key=lambda x: x[1])
                 for key in p_dict_sorted[:500]:
-                    shutil.copytree(os.path.join(src_path, key), dst_path)
+                    shutil.copy(os.path.join(src_path, key), dst_path)
             else:
                 for img in images_lst:
-                    shutil.copytree(os.path.join(src_path, img), dst_path)
+                    shutil.copy(os.path.join(src_path, img), dst_path)
 
 
 if __name__ == '__main__':
