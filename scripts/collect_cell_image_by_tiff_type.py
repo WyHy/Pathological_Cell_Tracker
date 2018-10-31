@@ -70,8 +70,8 @@ def do_collect_by_tiff_type(path, dict_):
             images_lst = os.listdir(src_path)
 
             dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
-            if not os.path.exists(dst_path):
-                os.makedirs(dst_path)
+            # if not os.path.exists(dst_path):
+            #     os.makedirs(dst_path)
 
             if item == 'HSIL' and len(images_lst) > 500:
                 print("FOUND HSIL COUNT > 500 IN %s" % tiff)
@@ -87,7 +87,7 @@ def do_collect_by_tiff_type(path, dict_):
                     shutil.copy(os.path.join(src_path, key[0]), dst_path)
             else:
                 # for img in images_lst:
-                shutil.copytree(src_path, img, dst_path)
+                shutil.copytree(src_path, dst_path)
 
 
 if __name__ == '__main__':
