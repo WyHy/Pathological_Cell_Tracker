@@ -4,7 +4,6 @@ import shutil
 
 import xlrd
 
-DST_PATH = "/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181030/TO_BE_CHECK_CELLS"
 PATTERN = re.compile(r'1\-p(0.\d{4}).*?.jpg')
 
 
@@ -68,7 +67,7 @@ def do_collect_by_tiff_type(path, dict_):
             src_path = os.path.join(src_root_dir, item)
             images_lst = os.listdir(src_path)
 
-            dst_path = os.path.join(DST_PATH, dict_[tiff], tiff, item)
+            dst_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             if not os.path.exists(dst_path):
                 os.makedirs(dst_path)
 
