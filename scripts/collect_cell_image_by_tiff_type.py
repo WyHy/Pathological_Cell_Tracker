@@ -4,7 +4,7 @@ import shutil
 
 import xlrd
 
-DST_PATH = ""
+DST_PATH = "/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181030/TO_BE_CHECK_CELLS"
 PATTERN = re.compile(r'1\-p(0.\d{4}).*?.jpg')
 
 
@@ -92,12 +92,12 @@ if __name__ == '__main__':
     xls_path = 'WANGYING-auto_label_task_2018.10.27.xlsx'
 
     # 切图任务 TIFF 任务清单
-    date_str = '20181031'
+    date_str = '20181030'
     name = 'work_tiff_list_%s.txt' % date_str
 
-    # 生成任务清单
-    generate_task_lst(xls_path, name)
+    # # 生成任务清单
+    # generate_task_lst(xls_path, name)
 
     # # 按数量类别限制收集细胞审核图像
-    # cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s/CELLS' % date_str
-    # do_collect_by_tiff_type(cell_path, get_tiff_name_and_type(xls_path))
+    cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s/CELLS' % date_str
+    do_collect_by_tiff_type(cell_path, get_tiff_name_and_type(xls_path))
