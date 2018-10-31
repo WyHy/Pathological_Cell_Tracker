@@ -23,7 +23,7 @@ def generate_task_lst(path, name):
     nrows = sheet.nrows
 
     with open(name, 'w') as o:
-        for i in range(1, nrows):
+        for i in range(0, nrows):
             tiff_name, tiff_type = sheet.row_values(i)
             if tiff_name:
                 o.write("%s\n" % tiff_name)
@@ -45,7 +45,7 @@ def get_tiff_name_and_type(path):
     # 获取行总数
     nrows = sheet.nrows
 
-    for i in range(1, nrows):
+    for i in range(0, nrows):
         tiff_name, tiff_type = sheet.row_values(i)
         dict_[tiff_name.replace(" ", "-")] = tiff_type.upper()
 
