@@ -74,6 +74,8 @@ def do_collect_by_tiff_type(path, dict_):
                 os.makedirs(dst_path)
 
             if item == 'HSIL' and len(images_lst) > 500:
+                print("FOUND HSIL COUNT > 500 IN %s" % tiff)
+
                 # 按概率大小排序
                 p_dict = {}
                 for img in images_lst:
@@ -84,8 +86,8 @@ def do_collect_by_tiff_type(path, dict_):
                 for key in p_dict_sorted[:500]:
                     shutil.copy(os.path.join(src_path, key[0]), dst_path)
             else:
-                for img in images_lst:
-                    shutil.copy(os.path.join(src_path, img), dst_path)
+                # for img in images_lst:
+                shutil.copytree(src_path, img, dst_path)
 
 
 if __name__ == '__main__':
