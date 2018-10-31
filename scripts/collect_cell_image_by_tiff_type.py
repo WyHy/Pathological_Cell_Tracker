@@ -60,14 +60,16 @@ def do_collect_by_tiff_type(path, dict_):
     :return:
     """
     files = os.listdir(path)
-    for tiff in files:
+    total = len(files)
+    for index, tiff in enumerate(files):
+        print("%s / %s ..." % (index + 1, total))
         src_root_dir = os.path.join(path, tiff)
         types = os.listdir(src_root_dir)
         for item in types:
             src_path = os.path.join(src_root_dir, item)
             images_lst = os.listdir(src_path)
 
-            dst_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
+            dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             if not os.path.exists(dst_path):
                 os.makedirs(dst_path)
 
@@ -80,7 +82,7 @@ def do_collect_by_tiff_type(path, dict_):
 
                 p_dict_sorted = sorted(p_dict.items(), key=lambda x: x[1])
                 for key in p_dict_sorted[:500]:
-                    shutil.copy(os.path.join(src_path, key), dst_path)
+                    shutil.copy(os.path.join(src_path, key[0]), dst_path)
             else:
                 for img in images_lst:
                     shutil.copy(os.path.join(src_path, img), dst_path)
