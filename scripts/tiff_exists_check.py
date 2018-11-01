@@ -7,7 +7,7 @@ sys.path.append('..')
 from common.tslide.tslide import TSlide
 from utils import generate_name_path_dict, FilesScanner
 
-TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181026'
+TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181031'
 
 REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF"
 
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     # 检查文件名是否有重复
     # tiff_readable_check(REMOTE_TIFF_PATH)
 
-    get_and_download('work_tiff_list_20181026.txt')
+    get_and_download('work_tiff_list_20181031.txt')

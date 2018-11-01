@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     # resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s' % flag
 
-    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181026_1'
+    resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181031'
     if test:
         # TIFF 图像存储路径
         tiff_dir_path = os.path.join(resource_path, 'test', 'TIFF')
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     # # 获取 TIFF 图像文件地址列表
     # tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
 
-    tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181026'
+    tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181031'
     # tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb', '.tif'])
     
     tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
