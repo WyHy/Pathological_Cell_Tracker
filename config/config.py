@@ -34,7 +34,7 @@ __C.darknet = edict()
 __C.darknet.classes = ["ASCUS", "LSIL", "ASCH", "HSIL", "SCC", "AGC", "EC", "FUNGI", "TRI", "CC", "ACTINO", "VIRUS"]
 __C.darknet.dartnetlib = os.path.join(curr_path, "models/darknet/libdarknet.so")
 __C.darknet.cfg_file = os.path.join(curr_path, "models/darknet/yolov3-minitest-12-infer.cfg")
-__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_final.weights")
+__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-12_400000.weights")
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-12-1009.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-12.names")
 __C.darknet.thresh = 0.1
@@ -52,7 +52,7 @@ __C.darknet.min_overlap_ratio = 0.6
 __C.xception = edict()
 __C.xception.det1 = -0.05  # used in gen_np_array
 __C.xception.size = 299
-__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_40.h5")
+__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_65.h5")
 # __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune.h5")
 
 __C.xception.classes = ["ACTINO", "AGC", "ASCH", "ASCUS", "CC", "EC", "FUNGI", 
