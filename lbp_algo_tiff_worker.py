@@ -164,7 +164,7 @@ class PCK:
             clas_csv = os.path.join(self.meta_files_path, tiff_basename + '_clas.csv')
             clas.write_csv(clas_dict, clas_csv)
 
-            ############################### 获取审核图像 ######################################################
+            ############################### 生成审核图像 ######################################################
             # GET VIEW CELL IMAGES
             clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=2)
             t4 = datetime.datetime.now()
