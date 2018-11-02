@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     for key, value in dict_.items():
         if value in CLASSES:
-            COUNT[COUNT.index(value)] += 1
+            COUNT[CLASSES.index(value)] += 1
 
     print(CLASSES)
     print(COUNT)
