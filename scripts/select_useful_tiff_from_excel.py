@@ -35,7 +35,7 @@ if __name__ == '__main__':
     print(COUNT)
 
     for key, lst in type_lst.items():
-        with open("work_tiff_list_20181031_%s.txt" % key, 'w') as o:
+        with open("work_tiff_list_20181102_%s.txt" % key, 'w') as o:
             o.write("%s" % ("\n".join(lst)))
 
 
