@@ -19,12 +19,26 @@ if __name__ == '__main__':
     CLASSES = ['AGC', 'VIRUS', 'EC', 'FUNGI', 'ACTINO']
     COUNT = [0] * len(CLASSES)
 
+    type_lst = {}
+
     for key, value in dict_.items():
         if value in CLASSES:
-            COUNT[CLASSES.index(value)] += 1
+            if value in type_lst:
+                type_lst[value].append(key)
+            else:
+                type_lst[value] = [key]
+
+            index = CLASSES.index(value)
+            COUNT[index] += 1
 
     print(CLASSES)
     print(COUNT)
+
+    for key, lst in type_lst.items():
+        with open("work_tiff_list_20181031_%s.txt" % key, 'w') as o:
+            o.write("%s" % ("\n".join(lst)))
+
+
 
 
 
