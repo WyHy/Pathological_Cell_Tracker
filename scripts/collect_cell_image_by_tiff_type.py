@@ -1,10 +1,25 @@
 import os
 import re
 import shutil
+import json
 
 import xlrd
 
 PATTERN = re.compile(r'1\-p(0.\d{4}).*?.jpg')
+
+
+def load_dict(file_path):
+    with open(file_path) as f:
+        lines = f.readlines()
+
+        dict_ = {}
+        for line in lines:
+            key, value = line.replace('\n', '').split('\t')
+            key = key.replace(' ', '-')
+            value = json.loads(value)
+            dict_[key.replace(' ', '-')] = value['zhu'] if value['zhu'] != 42 else value['doctor']
+
+        return dict_
 
 
 def generate_task_lst(path, name):
@@ -91,16 +106,17 @@ def do_collect_by_tiff_type(path, dict_):
 
 
 if __name__ == '__main__':
-    # excel 文件路径
-    xls_path = 'WANGYING-auto_label_task_2018.10.27.xlsx'
-
-    # 切图任务 TIFF 任务清单
-    date_str = '20181030'
-    name = 'work_tiff_list_%s.txt' % date_str
+    # # excel 文件路径
+    # xls_path = 'WANGYING-auto_label_task_2018.10.27.xlsx'
+    #
+    # # 切图任务 TIFF 任务清单
+    # date_str = '20181030'
+    # name = 'work_tiff_list_%s.txt' % date_str
 
     # # 生成任务清单
     # generate_task_lst(xls_path, name)
 
     # # 按数量类别限制收集细胞审核图像
-    cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s/CELLS' % date_str
-    do_collect_by_tiff_type(cell_path, get_tiff_name_and_type(xls_path))
+    cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181102_SELECTED/CELLS'
+    dict_path = 'DIAGNOSE_RESULT_DICT.txt'
+    do_collect_by_tiff_type(cell_path, load_dict(xls_path))
