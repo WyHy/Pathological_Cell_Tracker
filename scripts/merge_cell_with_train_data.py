@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('..')
 
-from utils import get_location_from_filename, cal_IOU, FilesScanner
+from utils import cal_IOU, FilesScanner
 
 
 def get_tiff_children_lst(path):
@@ -35,7 +35,7 @@ def restore_tiff_children_lst(path):
     :param path:
     :return:
     """
-    images = FilesScanner(path).get_files()
+    images = FilesScanner(path, ['jpg']).get_files()
 
     # TC18053113_x54903_y33619_w465_h522_s95.jpg
     pattern = re.compile(r'(.*?)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_s(\d+).jpg')
