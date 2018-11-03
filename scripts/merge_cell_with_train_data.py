@@ -79,40 +79,44 @@ if __name__ == '__main__':
     pattern01 = re.compile(r'.*?_x(\d+)_y(\d+)_w(\d+)_h(\d+)_?(\dx)?.jpg')
     pattern02 = re.compile(r'.*?_x(\d+)_y(\d+)_w(\d+)_h(\d+)_s(\d+).jpg')
 
+    print(cell_dict.keys()[:20])
+    print(train_dict.keys()[:20])
     for index, key in enumerate(keys):
         print("%s / %s %s ... " % (index + 1, total, key))
 
         lst01 = cell_dict[key]
 
         if key in train_dict:
-            lst02 = train_dict[key]
+            print(key)
 
-            for ctype01, path01 in lst01:
-                basename = os.path.basename(path01)
-                x01, y01, w01, h01, _ = re.findall(pattern01, basename)
-
-                for ctype02, path02 in lst02:
-                    basename = os.path.basename(path01)
-                    x02, y02, w02, h02, _ = re.findall(pattern02, basename)
-
-                    ratio = cal_IOU((int(x01), int(y01), int(w01), int(h01)), (int(x02), int(y02), int(w02), int(h02)))
-                    if ratio > 0.5:
-                        cell_save_path = os.path.join(merge_dir_path, key, ctype02)
-                        if not os.path.exists(cell_save_path):
-                            os.makedirs(cell_save_path)
-
-                        shutil.copy(path01, cell_save_path)
-                        break
-                else:
-                    cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
-                    if not os.path.exists(cell_save_path):
-                        os.makedirs(cell_save_path)
-
-                    shutil.copy(path01, cell_save_path)
-        else:
-            for ctype01, path01 in lst01:
-                cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
-                if not os.path.exists(cell_save_path):
-                    os.makedirs(cell_save_path)
-
-                shutil.copy(path01, cell_save_path)
+        #     lst02 = train_dict[key]
+        #
+        #     for ctype01, path01 in lst01:
+        #         basename = os.path.basename(path01)
+        #         x01, y01, w01, h01, _ = re.findall(pattern01, basename)
+        #
+        #         for ctype02, path02 in lst02:
+        #             basename = os.path.basename(path01)
+        #             x02, y02, w02, h02, _ = re.findall(pattern02, basename)
+        #
+        #             ratio = cal_IOU((int(x01), int(y01), int(w01), int(h01)), (int(x02), int(y02), int(w02), int(h02)))
+        #             if ratio > 0.5:
+        #                 cell_save_path = os.path.join(merge_dir_path, key, ctype02)
+        #                 if not os.path.exists(cell_save_path):
+        #                     os.makedirs(cell_save_path)
+        #
+        #                 shutil.copy(path01, cell_save_path)
+        #                 break
+        #         else:
+        #             cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
+        #             if not os.path.exists(cell_save_path):
+        #                 os.makedirs(cell_save_path)
+        #
+        #             shutil.copy(path01, cell_save_path)
+        # else:
+        #     for ctype01, path01 in lst01:
+        #         cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
+        #         if not os.path.exists(cell_save_path):
+        #             os.makedirs(cell_save_path)
+        #
+        #         shutil.copy(path01, cell_save_path)
