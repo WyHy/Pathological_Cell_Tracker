@@ -17,7 +17,8 @@ def load_dict(file_path):
             key, value = line.replace('\n', '').split('\t')
             key = key.replace(' ', '-')
             value = json.loads(value)
-            dict_[key.replace(' ', '-')] = value['zhu'] if value['zhu'] != 42 else value['doctor']
+            value = value['zhu'] if value['zhu'] != 42 else value['doctor']
+            dict_[key.replace(' ', '-')] = value if value != 42 else "UNKNOWN"
 
         return dict_
 
@@ -84,7 +85,7 @@ def do_collect_by_tiff_type(path, dict_):
             src_path = os.path.join(src_root_dir, item)
             images_lst = os.listdir(src_path)
 
-            print(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
+            # print(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             # if not os.path.exists(dst_path):
             #     os.makedirs(dst_path)
