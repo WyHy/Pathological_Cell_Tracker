@@ -89,12 +89,11 @@ if __name__ == '__main__':
 
             for ctype01, path01 in lst01:
                 basename = os.path.basename(path01)
-                print(basename)
-                x01, y01, w01, h01, _ = re.findall(pattern01, basename)
+                x01, y01, w01, h01, _ = re.findall(pattern01, basename)[0]
 
                 for ctype02, path02 in lst02:
                     basename = os.path.basename(path01)
-                    x02, y02, w02, h02, _ = re.findall(pattern02, basename)
+                    x02, y02, w02, h02, _ = re.findall(pattern02, basename)[0]
 
                     ratio = cal_IOU((int(x01), int(y01), int(w01), int(h01)), (int(x02), int(y02), int(w02), int(h02)))
                     if ratio > 0.5:
