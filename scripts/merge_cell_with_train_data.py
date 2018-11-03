@@ -89,6 +89,7 @@ if __name__ == '__main__':
 
             for ctype01, path01 in lst01:
                 basename = os.path.basename(path01)
+                print(basename)
                 x01, y01, w01, h01, _ = re.findall(pattern01, basename)
 
                 for ctype02, path02 in lst02:
