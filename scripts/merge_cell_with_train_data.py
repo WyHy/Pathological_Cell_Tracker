@@ -22,7 +22,7 @@ def get_tiff_children_lst(path):
 
         lst = []
         for ctype in ctypes:
-            lst.extend([(ctype, item) for item in os.listdir(os.path.join(path, tiff, ctype))])
+            lst.extend([(ctype, os.path.join(path, tiff, ctype, item)) for item in os.listdir(os.path.join(path, tiff, ctype))])
 
         dict_[tiff] = lst
 
