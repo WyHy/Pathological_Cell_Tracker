@@ -46,7 +46,6 @@ def restore_tiff_children_lst(path):
         basename = os.path.basename(image)
         ctype = os.path.basename(os.path.dirname(image))
 
-        print(basename)
         tiff_name, x, y, w, h, s = re.findall(pattern, basename)[0]
         if tiff_name in dict_:
             dict_[tiff_name].append((ctype, image))
@@ -80,8 +79,6 @@ if __name__ == '__main__':
     pattern01 = re.compile(r'.*?_x(\d+)_y(\d+)_w(\d+)_h(\d+)_?(\dx)?.jpg')
     pattern02 = re.compile(r'.*?_x(\d+)_y(\d+)_w(\d+)_h(\d+)_s(\d+).jpg')
 
-    print(cell_dict.keys()[:20])
-    print(train_dict.keys()[:20])
     for index, key in enumerate(keys):
         print("%s / %s %s ... " % (index + 1, total, key))
 
@@ -89,7 +86,6 @@ if __name__ == '__main__':
 
         if key in train_dict:
             print(key)
-
         #     lst02 = train_dict[key]
         #
         #     for ctype01, path01 in lst01:
