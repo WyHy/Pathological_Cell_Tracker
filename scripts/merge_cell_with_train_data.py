@@ -45,6 +45,7 @@ def restore_tiff_children_lst(path):
         basename = os.path.basename(image)
         ctype = os.path.basename(os.path.dirname(image))
 
+        print(basename)
         tiff_name, x, y, w, h, s = re.findall(pattern, basename)[0]
         if tiff_name in dict_:
             dict_[tiff_name].append((ctype, image))
