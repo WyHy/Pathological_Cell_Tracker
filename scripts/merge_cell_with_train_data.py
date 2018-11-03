@@ -36,6 +36,7 @@ def restore_tiff_children_lst(path):
     :return:
     """
     images = FilesScanner(path, ['jpg']).get_files()
+    print("TRAIN_DATA IMAGE COUNT: %s" % len(images))
 
     # TC18053113_x54903_y33619_w465_h522_s95.jpg
     pattern = re.compile(r'(.*?)_x(\d+)_y(\d+)_w(\d+)_h(\d+)_s(\d+).jpg')
