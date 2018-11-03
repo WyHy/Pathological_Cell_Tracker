@@ -98,12 +98,21 @@ if __name__ == '__main__':
                     ratio = cal_IOU((int(x01), int(y01), int(w01), int(h01)), (int(x02), int(y02), int(w02), int(h02)))
                     if ratio > 0.5:
                         cell_save_path = os.path.join(merge_dir_path, key, ctype02)
+                        if not os.path.exists(cell_save_path):
+                            os.makedirs(cell_save_path)
+
                         shutil.copy(path01, cell_save_path)
                         break
                 else:
                     cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
+                    if not os.path.exists(cell_save_path):
+                        os.makedirs(cell_save_path)
+
                     shutil.copy(path01, cell_save_path)
         else:
             for ctype01, path01 in lst01:
                 cell_save_path = os.path.join(merge_dir_path, key, ctype01 + '_NEW')
+                if not os.path.exists(cell_save_path):
+                    os.makedirs(cell_save_path)
+
                 shutil.copy(path01, cell_save_path)
