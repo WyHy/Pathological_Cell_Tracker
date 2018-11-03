@@ -84,6 +84,7 @@ def do_collect_by_tiff_type(path, dict_):
             src_path = os.path.join(src_root_dir, item)
             images_lst = os.listdir(src_path)
 
+            print(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
             # if not os.path.exists(dst_path):
             #     os.makedirs(dst_path)
@@ -119,4 +120,4 @@ if __name__ == '__main__':
     # # 按数量类别限制收集细胞审核图像
     cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181102_SELECTED/CELLS'
     dict_path = 'DIAGNOSE_RESULT_DICT.txt'
-    do_collect_by_tiff_type(cell_path, load_dict(xls_path))
+    do_collect_by_tiff_type(cell_path, load_dict(dict_path))
