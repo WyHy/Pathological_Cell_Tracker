@@ -118,6 +118,6 @@ if __name__ == '__main__':
     # generate_task_lst(xls_path, name)
 
     # # 按数量类别限制收集细胞审核图像
-    cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181102_SELECTED/MERGE '
+    cell_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181102_SELECTED/MERGE'
     dict_path = 'DIAGNOSE_RESULT_DICT.txt'
     do_collect_by_tiff_type(cell_path, load_dict(dict_path))
