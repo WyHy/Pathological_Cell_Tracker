@@ -290,7 +290,9 @@ def download_tiff_to_local(work_list, local_save_path, local_resource_pool=LOCAL
     :param remote_tiff_path: 远程图像文件资源池
     :return:
     """
-    if not os.path.join(local_save_path):
+
+    local_save_path = os.path.join(local_save_path, 'TIFFS')
+    if not os.path.exists(local_save_path):
         os.makedirs(local_save_path)
 
     tiff_dict = generate_name_path_dict(local_save_path, ['.kfb', '.tif'])
