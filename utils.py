@@ -239,7 +239,7 @@ def generate_datetime_label():
     return datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
 
-def generate_work_list(excel_path, output_txt_path):
+def generate_work_list(excel_path):
     """
     基于 excel 文件生成文件名对应病理分类 txt
     :param excel_path: excel 文件路径
