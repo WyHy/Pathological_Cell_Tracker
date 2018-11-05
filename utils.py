@@ -1,7 +1,10 @@
 # coding: utf-8
-
+import datetime
 import os
 import re
+import shutil
+
+import xlrd
 
 
 def get_path_postfix(filename):
@@ -228,8 +231,95 @@ def get_location_from_filename(filename_string):
         return None
 
 
-if __name__ == '__main__':
-    clas_files_path = '/home/tsimage/Development/DATA/meta'
-    cell_images_path = '/home/tsimage/Development/DATA/cells'
+def generate_datetime_label():
+    """
+    生成日期时间对应时间戳字符串
+    :return:
+    """
+    return datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-    get_processed_lst(clas_files_path, cell_images_path)
+
+def generate_work_list(excel_path, output_txt_path):
+    """
+    基于 excel 文件生成文件名对应病理分类 txt
+    :param excel_path: excel 文件路径
+    :return:
+    """
+
+    # 得到Excel文件的book对象，实例化对象
+    book = xlrd.open_workbook(excel_path)
+
+    # 通过sheet索引获得sheet对象
+    sheet = book.sheet_by_index(0)
+
+    # # 获得指定索引的sheet表名字
+    # sheet_name = book.sheet_names()[0]
+    #
+    # # 通过sheet名字来获取，当然如果知道sheet名字就可以直接指定
+    # sheet1 = book.sheet_by_name(sheet_name)
+
+    # 获取行总数
+    nrows = sheet.nrows
+
+    dict_ = {}
+    for i in range(1, nrows):
+        tiff_name, pt_type = sheet.row_values(i)
+        basename, _ = os.path.splitext(os.path.basename(tiff_name))
+        dict_[basename] = pt_type
+
+    # txt_save_path = os.path.join(output_txt_path, 'work_tiff_list_%s.txt' % generate_datetime_label())
+    # with open(txt_save_path, 'w') as o:
+    #     for key, value in dict_.items():
+    #         o.write("%s\t%s\n" % (key.encode('utf-8').decode('utf-8'), value.encode('utf-8').decode('utf-8')))
+    #
+    # print("WORK LIST SAVED IN: %s" % txt_save_path)
+    return dict_
+
+
+# 数据服务器 图像存放地址
+REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF"
+LOCAL_RESOURCE_POOL = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS"
+
+
+def download_tiff_to_local(work_list, local_save_path, local_resource_pool=LOCAL_RESOURCE_POOL, remote_tiff_path=REMOTE_TIFF_PATH):
+    """
+    下载任务文件至被你
+    :param work_list: 待处理图像名称列表
+    :param local_save_path: 本地图像存放路径
+    :param local_resource_pool: 本地图像文件资源池
+    :param remote_tiff_path: 远程图像文件资源池
+    :return:
+    """
+    if not os.path.join(local_save_path):
+        os.makedirs(local_save_path)
+
+    tiff_dict = generate_name_path_dict(local_save_path, ['.kfb', '.tif'])
+    local_tiff_dict = generate_name_path_dict(local_resource_pool, ['.kfb', '.tif'])
+    remote_tiff_dict = generate_name_path_dict(remote_tiff_path, ['.kfb', '.tif'])
+
+    total = len(work_list)
+    for index, item in enumerate(work_list):
+        print("%s / %s" % (index + 1, total))
+        if item not in tiff_dict:
+            if item in local_tiff_dict:
+                remote_file_path = local_tiff_dict[item]
+            else:
+                if item in remote_tiff_dict:
+                    remote_file_path = remote_tiff_dict[item]
+                else:
+                    print("%s IS NOT FOUND ANYWHERE!" % item)
+                    continue
+
+            print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, local_save_path))
+            shutil.copy(remote_file_path, local_save_path)
+        else:
+            print("%s IS ALREADY EXIST!" % item)
+
+
+if __name__ == '__main__':
+    # clas_files_path = '/home/tsimage/Development/DATA/meta'
+    # cell_images_path = '/home/tsimage/Development/DATA/cells'
+    #
+    # get_processed_lst(clas_files_path, cell_images_path)
+
+    print(generate_datetime_label())

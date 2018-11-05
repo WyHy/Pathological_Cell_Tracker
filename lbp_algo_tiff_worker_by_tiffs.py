@@ -12,7 +12,7 @@ from models.darknet.darknet_predict import DarknetPredict
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
-from utils import FilesScanner, generate_name_path_dict
+from utils import FilesScanner
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
 
@@ -141,7 +141,7 @@ class PCK:
                 # 任务切分
                 n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
                 cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
-                
+
                 for gpu_index, patch in enumerate(cell_patches):
                     tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
 
@@ -180,55 +180,28 @@ if __name__ == "__main__":
 
     t0 = datetime.datetime.now()
 
-    # resource_path = '/home/cnn/Development/DATA/RESOURCE'
-    # resource_path = '/home/tsimage/Development/DATA/RESOURCE'
-
-    # flag = "20181026"
-    # need_process_file_path = 'work_tiff_list_zhenzhou_3.txt'
-
-    # resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_%s' % flag
-
-    # resource_path = '/home/cnn/Development/DATA/CELL_CLASSIFIED_JOB_20181031'
-    resource_path = sys.argv[1]
+    tiff_dir_path, resource_save_path = sys.argv[1], sys.argv[2]
 
     if test:
-        # TIFF 图像存储路径
-        tiff_dir_path = os.path.join(resource_path, 'test', 'TIFF')
-
         # 切图文件存储路径
-        slice_dir_path = os.path.join(resource_path, 'test', 'SLICE')
+        slice_dir_path = os.path.join(resource_save_path, 'test', 'SLICE')
 
         # 中间文件存放目录
-        meta_files_path = os.path.join(resource_path, 'test', 'META')
+        meta_files_path = os.path.join(resource_save_path, 'test', 'META')
 
         # 识别出的细胞存储路径
-        cells_save_path = os.path.join(resource_path, 'test', 'CELLS')
+        cells_save_path = os.path.join(resource_save_path, 'test', 'CELLS')
     else:
-        # TIFF 图像存储路径
-        tiff_dir_path = os.path.join(resource_path, 'TIFF')
-
         # 切图文件存储路径
-        slice_dir_path = os.path.join(resource_path, 'SLICE')
+        slice_dir_path = os.path.join(resource_save_path, 'SLICE')
 
         # 中间文件存放目录
-        meta_files_path = os.path.join(resource_path, 'META')
+        meta_files_path = os.path.join(resource_save_path, 'META')
 
         # 识别出的细胞存储路径
-        cells_save_path = os.path.join(resource_path, 'CELLS')
+        cells_save_path = os.path.join(resource_save_path, 'CELLS')
 
-    # # 获取 TIFF 图像文件地址列表
-    # tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
-
-    # tiff_dir_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/20181031'
-    # tiff_dict = generate_name_path_dict(tiff_dir_path, ['.kfb', '.tif'])
-
-    tiff_dir_path = sys.argv[2]
     tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
-
-    # with open(need_process_file_path) as f:
-    #     lines = f.readlines()
-    #     items = [line.replace('\n', '').replace(' ', '-') for line in lines]
-    #     tiff_lst.extend([tiff_dict[item] for item in items])
 
     # 执行 TIFF 文件完整性校验
     for tiff in tiff_lst:
