@@ -218,6 +218,7 @@ if __name__ == "__main__":
             os.makedirs(item)
 
     PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
+    print("PLEASE GET CELL IMAGES IN %s" % cells_save_path)
 
     t1 = datetime.datetime.now()
     print("TIFF NUM: %s， TOTAL COST %s ..." % (len(tiff_lst), (t1 - t0)))
