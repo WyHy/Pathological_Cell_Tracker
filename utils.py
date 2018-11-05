@@ -262,7 +262,7 @@ def generate_work_list(excel_path, output_txt_path):
     nrows = sheet.nrows
 
     dict_ = {}
-    for i in range(1, nrows):
+    for i in range(0, nrows):
         tiff_name, pt_type = sheet.row_values(i)
         basename, _ = os.path.splitext(os.path.basename(tiff_name))
         dict_[basename] = pt_type
