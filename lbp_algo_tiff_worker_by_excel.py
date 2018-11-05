@@ -189,12 +189,14 @@ def do_collect_by_tiff_type(path, dict_):
 
     # 文件归类存放路径
     save_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS')
+    if os.path.exists(save_path):
+        shutil.rmtree(save_path)
 
     # 获取大图列表
     tiffs = os.listdir(path)
     total = len(tiffs)
     for index, tiff in enumerate(tiffs):
-        print("%s / %s ..." % (index + 1, total))
+        print("%s / %s  %s..." % (index + 1, total, tiff))
         src_root_dir = os.path.join(path, tiff)
 
         # 获取大图下包含细胞类别名称
