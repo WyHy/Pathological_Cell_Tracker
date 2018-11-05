@@ -291,7 +291,6 @@ def download_tiff_to_local(work_list, local_save_path, local_resource_pool=LOCAL
     :return:
     """
 
-    local_save_path = os.path.join(local_save_path, 'TIFFS')
     if not os.path.exists(local_save_path):
         os.makedirs(local_save_path)
 
