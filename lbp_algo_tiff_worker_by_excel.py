@@ -286,5 +286,9 @@ if __name__ == "__main__":
     print("4-JOB START...")
     PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
 
+    # 执行文件归类操作
+    print("5-TIFFS CLASSIFICATION ...")
+    do_collect_by_tiff_type(cells_save_path, job_dict)
+
     t1 = datetime.datetime.now()
     print("TIFF NUM: %s， TOTAL COST %s ..." % (len(tiff_lst), (t1 - t0)))
