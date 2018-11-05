@@ -205,9 +205,6 @@ def do_collect_by_tiff_type(path, dict_):
             images_lst = os.listdir(src_path)
 
             dst_path = os.path.join(save_path, dict_[tiff], tiff, ctype)
-            if not os.path.exists(dst_path):
-                os.makedirs(dst_path)
-
             if ctype == 'HSIL' and len(images_lst) > 500:
                 print("FOUND HSIL COUNT > 500 IN %s" % tiff)
 
