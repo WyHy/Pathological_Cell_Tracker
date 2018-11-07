@@ -158,7 +158,7 @@ class XceptionPostprocess:
         # result collect
         tasks = []
         for patch in patches:
-            tasks.append(executor.submit(worker, tifname, patch, new_dict, save_path))
+            tasks.append(executor.submit(worker, tifname, patch, new_dict, save_path, N))
 
         task_count = len(tasks)
         cells_count = 0
