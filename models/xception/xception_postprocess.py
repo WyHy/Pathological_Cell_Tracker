@@ -10,7 +10,7 @@ from shapely import geometry
 
 from common.tslide.tslide import TSlide
 from config.config import cfg
-from utils import get_tiff_dict
+from utils import get_tiff_dict, worker
 
 pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
@@ -141,39 +141,6 @@ class XceptionPostprocess:
                                image size is twice the annotation box.
                                check if the cell is marked, add marked if so.)
         """
-
-        def worker(tiff_path, keys, points_dict, save_path):
-            try:
-                slide = openslide.OpenSlide(tiff_path)
-            except:
-                slide = TSlide(tiff_path)
-
-            cell_count = 0
-            for x_y in keys:
-                boxes = points_dict[x_y]
-                for box in boxes:
-                    x0, y0 = x_y.split('_')
-                    x = int(x0) + int(box[4][0])
-                    y = int(y0) + int(box[4][1])
-                    w = int(box[4][2])
-                    h = int(box[4][3])
-
-                    # make save dir
-                    cell_save_dir = os.path.join(save_path, box[2])
-                    os.makedirs(cell_save_dir, exist_ok=True)
-
-                    image_name = "1-p{:.10f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
-                    cell_save_path = os.path.join(cell_save_dir, image_name)
-
-                    slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,
-                                      (int(N * w), int(N * h))).convert("RGB").save(cell_save_path)
-
-                    cell_count += 1
-
-            slide.close()
-
-            return cell_count
-
         basename = os.path.splitext(os.path.basename(tifname))[0].replace(" ", "-")
         save_path = os.path.join(save_path, basename)
 
