@@ -2,16 +2,12 @@ import datetime
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-import numpy as np
 import openslide
 
 from common.tslide.tslide import TSlide
 from common.utils import ImageSlice
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
-from models.xception.xception_postprocess import XceptionPostprocess
-from models.xception.xception_predict import XceptionPredict
-from models.xception.xception_preprocess import XceptionPreprocess
 from utils import FilesScanner
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
@@ -25,16 +21,6 @@ def yolo_predict(gpu_index, images_lst):
     :return: dict: <x_y: [label, accuracy, xmin, ymin, xmax, ymax]>
     """
     return DarknetPredict(str(gpu_index)).predict(images_lst)
-
-
-def xception_predict(gpu_index, images_numpy):
-    """
-    Xception 识别细胞病理分类
-    :param gpu_index: gpu id
-    :param images_numpy: image numpy_array
-    :return:
-    """
-    return gpu_index, XceptionPredict(str(gpu_index)).predict(images_numpy)
 
 
 class PCK:
@@ -66,16 +52,6 @@ class PCK:
             tiff_basename = tiff_basename.replace(" ", "-")
             print('Process %s / %s %s ...' % (index + 1, total, tiff_basename))
 
-            # 检测是否已经切图并识别完成
-            # 检测细胞文件夹是否已经存在，若存在直接跳过
-            check_cell_path = os.path.join(self.cells_path, tiff_basename)
-
-            if os.path.exists(check_cell_path):
-                children = os.listdir(check_cell_path)
-                if len(children) > 0:
-                    print("%s HAS BEEN PROCESSED!" % tiff_basename)
-                    continue
-
             # 切片文件存储路径
             slice_save_path = os.path.join(self.slice_dir_path, tiff_basename)
 
@@ -90,88 +66,51 @@ class PCK:
             t1 = datetime.datetime.now()
             print('TIFF SLICE COST: %s' % (t1 - t0))
 
-            # CHECK IF ALREADY PROCESSED
-            seg_csv = os.path.join(self.meta_files_path, tiff_basename + "_seg.csv")
-
-            # 将细胞分割结果写入文件
-            xcep_pre = XceptionPreprocess(tiff)
-
-            if not os.path.exists(seg_csv):
-                #################################### YOLO 处理 #####################################################
-                tasks = []
-
-                # 创建切图进程池
-                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
-
-                if len(tif_images) < cfg.darknet.min_job_length:
-                    tasks.append(executor.submit(yolo_predict, '0', tif_images))
-                else:
-                    # 任务切分
-                    n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-                    patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
-
-                    for gpu_index, patch in enumerate(patches):
-                        tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
-
-                seg_results = {}
-                for future in as_completed(tasks):
-                    result = future.result()
-                    seg_results.update(result)
-
-                # 关闭进程池
-                executor.shutdown(wait=True)
-
-                # WRITE DATA TO CSV
-                xcep_pre.write_csv(seg_results, seg_csv)
-
-            t2 = datetime.datetime.now()
-            print("DARKNET COST %s" % (t2 - t1))
-
-            # XCEPTION preprocess
-            cell_lst, cell_index = xcep_pre.gen_np_array_csv(seg_csv=seg_csv)
-
-            ##################################### XCEPTION 处理 #################################################
             tasks = []
+
             # 创建切图进程池
             executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
-            if len(cell_lst) < cfg.xception.min_job_length:
-                tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
+            if len(tif_images) < cfg.darknet.min_job_length:
+                tasks.append(executor.submit(yolo_predict, '0', tif_images))
             else:
                 # 任务切分
-                n = int((len(cell_lst) / float(GPU_NUM)) + 0.5)
-                cell_patches = [cell_lst[i: i + n] for i in range(0, len(cell_lst), n)]
+                n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
+                patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
 
-                for gpu_index, patch in enumerate(cell_patches):
-                    tasks.append(executor.submit(xception_predict, str(gpu_index), np.asarray(patch)))
+                for gpu_index, patch in enumerate(patches):
+                    tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
 
-            predictions_ = {}
+            seg_results = {}
             for future in as_completed(tasks):
-                index, result = future.result()
-                predictions_[index] = result
-
-            predictions = []
-            for i in range(len(predictions_)):
-                predictions.extend(predictions_[str(i)])
+                result = future.result()
+                seg_results.update(result)
 
             # 关闭进程池
             executor.shutdown(wait=True)
 
-            t3 = datetime.datetime.now()
-            print("XCEPTION COST %s" % (t3 - t2))
+            try:
+                slide = openslide.OpenSlide(tiff)
+            except:
+                slide = TSlide(tiff)
 
-            clas = XceptionPostprocess()
-            clas_dict = clas.convert_all(predictions=predictions, cell_index=cell_index)
-            clas_csv = os.path.join(self.meta_files_path, tiff_basename + '_clas.csv')
-            clas.write_csv(clas_dict, clas_csv)
+            keys = list(seg_results.keys())
+            for key in keys:
+                lst = seg_results[key]
+                x0, y0 = key.split('_')
+                x0, y0 = int(x0), int(y0)
 
-            ############################### 生成审核图像 ######################################################
-            # GET VIEW CELL IMAGES
-            clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=1)
-            t4 = datetime.datetime.now()
-            print("GET VIEW IMAGES COST %s" % (t4 - t3))
+                for item in lst:
+                    label, accuracy, (x, y, w, h) = item
+                    accuracy, x, y, w, h = float(accuracy), int(x), int(y), int(w), int(h)
+                    x, y = x0 + x, y0 + y
 
-            print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
+                    save_path = os.path.join(self.cells_path, tiff_basename, label)
+                    if not os.path.exists(save_path):
+                        os.makedirs(save_path)
+
+                    image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}.jpg".format(1 - accuracy, tiff_basename, x, y, w, h)
+                    slide.read_region((x, y), 0, (w, h)).convert("RGB").save(os.path.join(save_path, image_name))
 
 
 if __name__ == "__main__":

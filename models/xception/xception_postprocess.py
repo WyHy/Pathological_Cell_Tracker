@@ -1,13 +1,16 @@
-import os
 import csv
+import os
+import re
+import xml.dom.minidom
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
 import numpy as np
 import openslide
-import xml.dom.minidom
 from shapely import geometry
-from config.config import cfg
+
 from common.tslide.tslide import TSlide
+from config.config import cfg
 from utils import get_tiff_dict
-import re
 
 pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
@@ -140,83 +143,71 @@ class XceptionPostprocess:
                                check if the cell is marked, add marked if so.)
         """
 
-        # https://www.lfd.uci.edu/~gohlke/pythonlibs/#shapely
-        def get_labels(xmlname):
-            """collect labeled boxes from asap xml
-            :param xmlname: full path name of .xml file, got from .tif/.kfb file
-            :output format: [[class_i, [(xi,yi),]],]
-            """
-            if not os.path.isfile(xmlname):
-                return []
-            classes = {"#aa0000": "HSIL", "#aa007f": "ASCH", "#005500": "LSIL", "#00557f": "ASCUS",
-                       "#0055ff": "SCC", "#aa557f": "ADC", "#aa55ff": "EC", "#ff5500": "AGC1",
-                       "#ff557f": "AGC2", "#ff55ff": "AGC3", "#00aa00": "FUNGI", "#00aa7f": "TRI",
-                       "#00aaff": "CC", "#55aa00": "ACTINO", "#55aa7f": "VIRUS", "#ffffff": "NORMAL",
-                       "#000000": "MC", "#aa00ff": "SC", "#ff0000": "RC", "#aa5500": "GEC"}
-            DOMTree = xml.dom.minidom.parse(xmlname)
-            collection = DOMTree.documentElement
-            annotations = collection.getElementsByTagName("Annotation")
-            marked_boxes = []
-            for annotation in annotations:
-                colorCode = annotation.getAttribute("Color")
-                if not colorCode in classes:
-                    continue
-                marked_box = [classes[colorCode], []]
-                coordinates = annotation.getElementsByTagName("Coordinate")
-                marked_box[1] = [(float(coordinate.getAttribute('X')), float(coordinate.getAttribute('Y'))) for
-                                 coordinate in coordinates]
-                marked_boxes.append(marked_box)
-            return marked_boxes
+        def worker(tiff_path, keys, points_dict, save_path):
+            try:
+                slide = openslide.OpenSlide(tiff_path)
+            except:
+                slide = TSlide(tiff_path)
 
-        def is_overlapped(marked_boxes, predicted_box, factor):
-            """check if predicted box is marked already
-            :param marked_boxes: [[class_i, [(xi,yi),]],]
-            :param box: (x, y, w, h)
-            :param factor: overlapping threshold, added marked info to image filename if overlapped
-            """
-            for marked_box in marked_boxes:
-                marked_box_obj = geometry.Polygon(marked_box[1])
-                predicted_box_obj = geometry.box(predicted_box[0],
-                                                 predicted_box[1],
-                                                 predicted_box[0] + predicted_box[2],
-                                                 predicted_box[1] + predicted_box[3])
-                if marked_box_obj.intersection(predicted_box_obj).area / (
-                        marked_box_obj.area + predicted_box_obj.area - marked_box_obj.intersection(
-                        predicted_box_obj).area) >= factor:
-                    return marked_box[0]
-            return ""
+            cell_count = 0
+            for x_y in keys:
+                boxes = points_dict[x_y]
+                for box in boxes:
+                    x0, y0 = x_y.split('_')
+                    x = int(x0) + int(box[4][0])
+                    y = int(y0) + int(box[4][1])
+                    w = int(box[4][2])
+                    h = int(box[4][3])
 
-        try:
-            slide = openslide.OpenSlide(tifname)
-        except:
-            slide = TSlide(tifname)
+                    # make save dir
+                    cell_save_dir = os.path.join(save_path, box[2])
+                    os.makedirs(cell_save_dir, exist_ok=True)
+
+                    image_name = "1-p{:.10f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
+                    cell_save_path = os.path.join(cell_save_dir, image_name)
+
+                    slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,
+                                      (int(N * w), int(N * h))).convert("RGB").save(cell_save_path)
+
+                    cell_count += 1
+
+            slide.close()
+
+            return cell_count
+
         basename = os.path.splitext(os.path.basename(tifname))[0].replace(" ", "-")
-        # parent_d = os.path.basename(os.path.dirname(tifname))
-        # save_path = os.path.join(save_path, parent_d, basename)
         save_path = os.path.join(save_path, basename)
-        marked_boxes = get_labels(os.path.splitext(tifname)[0] + ".xml")
-        for x_y, boxes in new_dict.items():
-            for box in boxes:
-                # image naming: tifname_x_y_w_h_p.jpg
-                x = int(x_y.split('_')[0]) + int(box[4][0])
-                y = int(x_y.split('_')[1]) + int(box[4][1])
-                w = int(box[4][2])
-                h = int(box[4][3])
 
-                marked_class_i = is_overlapped(marked_boxes, (x, y, w, h), factor)
-                if marked_class_i:
-                    image_name = "1-p{:.4f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], marked_class_i,
-                                                                                           basename, x, y, w, h, N)
-                    save_path_i = os.path.join(save_path, box[2], "marked")
-                else:
-                    image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
-                    save_path_i = os.path.join(save_path, box[2])
-                os.makedirs(save_path_i, exist_ok=True)
-                image_fullname = os.path.join(save_path_i, image_name)
-                slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,
-                                  (int(N * w), int(N * h))).convert("RGB").save(image_fullname)
+        keys = list(new_dict.keys())
 
-        slide.close()
+        worker_num = cfg.slice.SLICE_PROCESS_NUM
+
+        # task segmentation
+        n = int((len(keys) / float(worker_num)) + 0.5)
+        patches = [keys[i: i + n] for i in range(0, len(keys), n)]
+
+        # create process pool
+        executor = ProcessPoolExecutor(max_workers=worker_num)
+
+        # result collect
+        tasks = []
+        for patch in patches:
+            tasks.append(executor.submit(worker, tifname, patch, new_dict, save_path))
+
+        task_count = len(tasks)
+        cells_count = 0
+        for future in as_completed(tasks):
+            cell_count = future.result()
+            cells_count += cell_count
+            task_count -= 1
+
+            print("Last Task num %s." % task_count)
+
+        plan_cell_count = 0
+        for key, lst in new_dict.items():
+            plan_cell_count += len(lst)
+
+        print("PLAN CELL COUNT: %s, VIEW CELLS COUNT: %s" % (plan_cell_count, cells_count))
 
     def cut_cells_p_marked_(self, tifname, new_dict, save_path, factor=0.3, N=4):
         def get_labels(xmlname):
@@ -280,12 +271,12 @@ class XceptionPostprocess:
 
                 marked_class_i = is_overlapped(marked_boxes, (x, y, w, h), factor)
                 if marked_class_i:
-                    image_name = "1-p{:.4f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3],
-                                                                                           marked_class_i, basename,
-                                                                                           x, y, w, h, N)
+                    image_name = "1-p{:.10f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3],
+                                                                                            marked_class_i, basename,
+                                                                                            x, y, w, h, N)
                     save_path_i = os.path.join(save_path, box[2], "marked")
                 else:
-                    image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
+                    image_name = "1-p{:.10f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
                     save_path_i = os.path.join(save_path, box[2])
 
                 os.makedirs(save_path_i, exist_ok=True)

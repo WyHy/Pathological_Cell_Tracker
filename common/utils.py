@@ -1,8 +1,8 @@
 import datetime
 import math
 import os
-import requests
 import shutil
+import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from copy import deepcopy
 
@@ -10,11 +10,8 @@ import cv2
 import numpy as np
 import openslide
 
-from config.config import cfg
 from common.tslide.tslide import TSlide
-
-import uuid
-import traceback
+from config.config import cfg
 
 
 def update_algorithm_progress(task_id, progress):
@@ -44,7 +41,8 @@ def image_format(image, width=cfg.algo.DEFAULT_WIDTH, height=cfg.algo.DEFAULT_HE
     dh, dw = max(0, height - h), max(0, width - w)
     top, bottom = dh // 2, dh - dh // 2
     left, right = dw // 2, dw - dw // 2
-    image = cv2.copyMakeBorder(image, top=top, bottom=bottom, left=left, right=right, borderType=cv2.BORDER_CONSTANT, value=(0, 0, 0))
+    image = cv2.copyMakeBorder(image, top=top, bottom=bottom, left=left, right=right, borderType=cv2.BORDER_CONSTANT,
+                               value=(0, 0, 0))
 
     h, w, _ = image.shape
     x = h // 2 - height // 2
@@ -76,7 +74,9 @@ def generate_cell_image(image_path, names, points):
             label, accuracy, (x, y, w, h) = point
             x, y, w, h = int(x), int(y), int(w), int(h)
             cell = image[y: y + h, x: x + w]
-            cells.append({'x0': int(x0), 'y0': int(y0), 'xmin': x, 'ymin': y, 'xmax': x + w, 'ymax': y + h, 'w': w, 'h': h, 'patch': image_format(cell), 'segment': {'label': label, 'accuracy': accuracy}})
+            cells.append(
+                {'x0': int(x0), 'y0': int(y0), 'xmin': x, 'ymin': y, 'xmax': x + w, 'ymax': y + h, 'w': w, 'h': h,
+                 'patch': image_format(cell), 'segment': {'label': label, 'accuracy': accuracy}})
 
             # cv2.imwrite('/tmp/metadata/cells/2/%s.jpg' % str(uuid.uuid4()), cell)
             # cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 4)
@@ -134,15 +134,6 @@ class FilesScanner(object):
 
     def get_files(self):
         return self.files
-
-
-def get_available_gpus():
-    """
-    获取 GPU 编号
-    """
-    from tensorflow.python.client import device_lib as _device_lib
-    local_device_protos = _device_lib.list_local_devices()
-    return [x.name.split(':')[-1] for x in local_device_protos if x.device_type == 'GPU']
 
 
 def worker(image, start_x, start_y, height, patch_width, patch_height, delta, patch_save_path):
@@ -258,12 +249,14 @@ class ImageSlice(object):
                     # 收集任务结果
                     tasks = []
                     while x < width:
-                        tasks.append(executor.submit(worker, image, x, y, height, cfg.slice.WIDTH, cfg.slice.HEIGHT, cfg.slice.DELTA, output_path))
+                        tasks.append(executor.submit(worker, image, x, y, height, cfg.slice.WIDTH, cfg.slice.HEIGHT,
+                                                     cfg.slice.DELTA, output_path))
                         x += cfg.slice.DELTA
 
                     t2 = datetime.datetime.now()
                     job_count = len(tasks)
-                    print("Done, cost: %s, Total Job Count: %s, Worker Count: %s" % ((t2 - t1), job_count, cfg.slice.SLICE_PROCESS_NUM))
+                    print("Done, cost: %s, Total Job Count: %s, Worker Count: %s" % (
+                    (t2 - t1), job_count, cfg.slice.SLICE_PROCESS_NUM))
 
                     # 计数器
                     patch_count = 0
@@ -276,7 +269,8 @@ class ImageSlice(object):
                         print("One Job Done, Got %s patches, last Job Count: %s" % (count, job_count))
 
                     t3 = datetime.datetime.now()
-                    print("File - %s, Size: (%s, %s), Got Patch Num %s, Total cost time: %s" % (img_name, _width, _height, patch_count, t3 - t0))
+                    print("File - %s, Size: (%s, %s), Got Patch Num %s, Total cost time: %s" % (
+                    img_name, _width, _height, patch_count, t3 - t0))
                     print(".jpg files saved path: %s" % output_path)
 
                     done.append(output_path)
@@ -392,12 +386,14 @@ class ImageSliceInMemory(object):
                     # 收集任务结果
                     tasks = []
                     while x < width:
-                        tasks.append(executor.submit(worker_in_memory, image, x, y, height, cfg.center.PATCH_WIDTH, cfg.center.PATCH_HEIGHT, cfg.center.DELTA))
+                        tasks.append(executor.submit(worker_in_memory, image, x, y, height, cfg.center.PATCH_WIDTH,
+                                                     cfg.center.PATCH_HEIGHT, cfg.center.DELTA))
                         x += cfg.center.DELTA
 
                     t2 = datetime.datetime.now()
                     job_count = len(tasks)
-                    print("Done, cost: %s, Total Job Count: %s, Worker Count: %s" % ((t2 - t1), job_count, cfg.slice.SLICE_PROCESS_NUM))
+                    print("Done, cost: %s, Total Job Count: %s, Worker Count: %s" % (
+                    (t2 - t1), job_count, cfg.slice.SLICE_PROCESS_NUM))
 
                     results = {}
                     # 计数器
@@ -412,7 +408,8 @@ class ImageSliceInMemory(object):
                         print("One Job Done, Got %s patches, last Job Count: %s" % (count, job_count))
 
                     t3 = datetime.datetime.now()
-                    print("File - %s, Size: (%s, %s), Got Patch Num %s, Total cost time: %s" % (img_name, _width, _height, patch_count, t3 - t0))
+                    print("File - %s, Size: (%s, %s), Got Patch Num %s, Total cost time: %s" % (
+                    img_name, _width, _height, patch_count, t3 - t0))
 
                     return cfg.code.success, results
             except Exception as e:

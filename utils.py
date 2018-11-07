@@ -267,12 +267,6 @@ def generate_work_list(excel_path):
         basename, _ = os.path.splitext(os.path.basename(tiff_name))
         dict_[basename] = pt_type
 
-    # txt_save_path = os.path.join(output_txt_path, 'work_tiff_list_%s.txt' % generate_datetime_label())
-    # with open(txt_save_path, 'w') as o:
-    #     for key, value in dict_.items():
-    #         o.write("%s\t%s\n" % (key.encode('utf-8').decode('utf-8'), value.encode('utf-8').decode('utf-8')))
-    #
-    # print("WORK LIST SAVED IN: %s" % txt_save_path)
     return dict_
 
 
@@ -281,7 +275,8 @@ REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=dat
 LOCAL_RESOURCE_POOL = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS"
 
 
-def download_tiff_to_local(work_list, local_save_path, local_resource_pool=LOCAL_RESOURCE_POOL, remote_tiff_path=REMOTE_TIFF_PATH):
+def download_tiff_to_local(work_list, local_save_path, local_resource_pool=LOCAL_RESOURCE_POOL,
+                           remote_tiff_path=REMOTE_TIFF_PATH):
     """
     下载任务文件至被你
     :param work_list: 待处理图像名称列表
