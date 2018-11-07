@@ -68,11 +68,10 @@ class XceptionPostprocess:
         """
         with open(clas_csv, "w") as f:
             writer = csv.writer(f)
-            writer.writerow(["x_y", "segment", "det", "classify", "det", "xmin", "ymin", "xmax", "ymax"])
+            writer.writerow(["x_y", "segment", "det", "classify", "det", "xmin", "ymin", "w", "h"])
             for x_y, boxes in new_dict.items():
                 for box in boxes:
-                    writer.writerow([x_y, box[0], box[1], box[2], box[3],
-                                     box[4][0], box[4][1], box[4][0] + box[4][2], box[4][1] + box[4][3]])
+                    writer.writerow([x_y, box[0], box[1], box[2], box[3], box[4][0], box[4][1], box[4][2], box[4][3]])
 
     def cut_cells(self, tifname, new_dict, save_path):
         """
