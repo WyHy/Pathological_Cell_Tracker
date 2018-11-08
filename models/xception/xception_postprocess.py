@@ -148,17 +148,21 @@ class XceptionPostprocess:
 
         worker_num = cfg.slice.SLICE_PROCESS_NUM
 
-        # task segmentation
-        n = int((len(keys) / float(worker_num)) + 0.5)
-        patches = [keys[i: i + n] for i in range(0, len(keys), n)]
-
         # create process pool
         executor = ProcessPoolExecutor(max_workers=worker_num)
 
         # result collect
         tasks = []
-        for patch in patches:
-            tasks.append(executor.submit(worker, tifname, patch, new_dict, save_path, N))
+
+        if len(keys) < cfg.xception.min_job_length:
+            tasks.append(executor.submit(worker, tifname, keys, new_dict, save_path, N))
+        else:
+            # task segmentation
+            n = int((len(keys) / float(worker_num)) + 0.5)
+            patches = [keys[i: i + n] for i in range(0, len(keys), n)]
+
+            for patch in patches:
+                tasks.append(executor.submit(worker, tifname, patch, new_dict, save_path, N))
 
         task_count = len(tasks)
         cells_count = 0
