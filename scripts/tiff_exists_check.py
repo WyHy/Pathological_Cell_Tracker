@@ -83,7 +83,7 @@ def get_and_download(file_path):
 
 
 def collect_useful_tiff_by_txt(path):
-    collect_tiff_path = "/home/cnn/Development/DATA/BATCH_4_TRAIN_DATA/TIFFS/"
+    collect_tiff_path = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/missed_tiff_for_xiong/"
     local_tiff_dict = generate_name_path_dict(LOCAL_TIFF_PATH, ['.kfb', '.tif'])
 
     with open(path) as f:
@@ -94,7 +94,7 @@ def collect_useful_tiff_by_txt(path):
         for index, item in enumerate(items):
             print("%s / %s %s..." % (index + 1, total, item))
             if item in local_tiff_dict:
-                shutil.copy(local_tiff_dict[item], collect_tiff_path)
+                shutil.move(local_tiff_dict[item], collect_tiff_path)
             else:
                 print(item)
                 exit()
@@ -103,7 +103,6 @@ def collect_useful_tiff_by_txt(path):
 if __name__ == '__main__':
     # 检查文件名是否有重复
     # tiff_readable_check(REMOTE_TIFF_PATH)
-
     # get_and_download('work_tiff_list_20181109_SELECTED.txt')
 
-    collect_useful_tiff_by_txt('work_tiff_list_20181109_SELECTED.txt')
+    collect_useful_tiff_by_txt('missed_tiff_list.txt')
