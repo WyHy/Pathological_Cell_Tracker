@@ -83,7 +83,7 @@ def get_and_download(file_path):
 
 
 def collect_useful_tiff_by_txt(path):
-    collect_tiff_path = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/missed_tiff_for_xiong/"
+    collect_tiff_path = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/TRAIN_TIFF_FOR_20181110/"
     local_tiff_dict = generate_name_path_dict(LOCAL_TIFF_PATH, ['.kfb', '.tif'])
 
     with open(path) as f:
@@ -105,4 +105,4 @@ if __name__ == '__main__':
     # tiff_readable_check(REMOTE_TIFF_PATH)
     # get_and_download('work_tiff_list_20181109_SELECTED.txt')
 
-    collect_useful_tiff_by_txt('missed_tiff_list.txt')
+    collect_useful_tiff_by_txt('work_tiff_list_20181109_SELECTED.txt')
