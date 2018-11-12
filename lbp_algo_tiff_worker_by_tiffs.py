@@ -116,6 +116,9 @@ class PCK:
                 seg_results = {}
                 for future in as_completed(tasks):
                     result = future.result()
+                    if not isinstance(result, 'dict'):
+                        print(result)
+
                     seg_results.update(result)
 
                 # 关闭进程池
