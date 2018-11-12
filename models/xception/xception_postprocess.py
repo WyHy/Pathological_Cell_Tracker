@@ -241,12 +241,10 @@ class XceptionPostprocess:
 
                 marked_class_i = is_overlapped(marked_boxes, (x, y, w, h), factor)
                 if marked_class_i:
-                    image_name = "1-p{:.10f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3],
-                                                                                            marked_class_i, basename,
-                                                                                            x, y, w, h, N)
+                    image_name = "1-p{:.4f}_markedAs_{}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], marked_class_i, basename, x, y, w, h, N)
                     save_path_i = os.path.join(save_path, box[2], "marked")
                 else:
-                    image_name = "1-p{:.10f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
+                    image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
                     save_path_i = os.path.join(save_path, box[2])
 
                 os.makedirs(save_path_i, exist_ok=True)
