@@ -337,7 +337,7 @@ def worker(tiff_path, keys, points_dict, save_path, N):
             cell_save_dir = os.path.join(save_path, box[2])
             os.makedirs(cell_save_dir, exist_ok=True)
 
-            image_name = "1-p{:.10f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
+            image_name = "1-p{:.4f}_{}_x{}_y{}_w{}_h{}_{}x.jpg".format(1 - box[3], basename, x, y, w, h, N)
             cell_save_path = os.path.join(cell_save_dir, image_name)
 
             slide.read_region((int(x + (1 - N) * w / 2), int(y + (1 - N) * h / 2)), 0,

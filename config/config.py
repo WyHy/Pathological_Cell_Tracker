@@ -62,7 +62,7 @@ __C.xception.class_num = 16
 # __C.xception.classes = ["ACTINO", "ADC", "AGC1", "AGC2", "ASCH", "ASCUS", "CC", "EC", "FUNGI", 
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 # __C.xception.class_num = 18
-__C.xception.det2 = 0.1   # used in gen output csv file
+__C.xception.det2 = 0.9   # used in gen output csv file
 __C.xception.min_job_length = 16
 __C.xception.min_overlap_ratio = 0.6
 
