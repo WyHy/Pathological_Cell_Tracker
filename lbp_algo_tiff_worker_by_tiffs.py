@@ -100,7 +100,7 @@ class PCK:
                 #################################### YOLO 处理 #####################################################
                 tasks = []
 
-                seg_results = yolo_predict(str(gpu_index), tif_images)
+                seg_results = yolo_predict('0', tif_images)
 
                 # # 创建切图进程池
                 # executor = ProcessPoolExecutor(max_workers=GPU_NUM)
