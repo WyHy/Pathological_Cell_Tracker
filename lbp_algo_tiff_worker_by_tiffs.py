@@ -101,7 +101,7 @@ class PCK:
                 tasks = []
 
                 # 创建切图进程池
-                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                executor = ProcessPoolExecutor(max_workers=GPU_NUM * 2)
 
                 if len(tif_images) < cfg.darknet.min_job_length:
                     tasks.append(executor.submit(yolo_predict, '0', tif_images))
@@ -133,7 +133,7 @@ class PCK:
             ##################################### XCEPTION 处理 #################################################
             tasks = []
             # 创建切图进程池
-            executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+            executor = ProcessPoolExecutor(max_workers=GPU_NUM * 2)
 
             if len(cell_lst) < cfg.xception.min_job_length:
                 tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
