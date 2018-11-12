@@ -100,29 +100,31 @@ class PCK:
                 #################################### YOLO 处理 #####################################################
                 tasks = []
 
-                # 创建切图进程池
-                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                seg_results = yolo_predict("0", tif_images)
 
-                if len(tif_images) < cfg.darknet.min_job_length:
-                    tasks.append(executor.submit(yolo_predict, '0', tif_images))
-                else:
-                    # 任务切分
-                    n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
-                    patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
-
-                    for gpu_index, patch in enumerate(patches):
-                        tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
-
-                seg_results = {}
-                for future in as_completed(tasks):
-                    result = future.result()
-                    if not isinstance(result, 'dict'):
-                        print(result)
-
-                    seg_results.update(result)
-
-                # 关闭进程池
-                executor.shutdown(wait=True)
+                # # 创建切图进程池
+                # executor = ProcessPoolExecutor(max_workers=GPU_NUM)
+                #
+                # if len(tif_images) < cfg.darknet.min_job_length:
+                #     tasks.append(executor.submit(yolo_predict, '0', tif_images))
+                # else:
+                #     # 任务切分
+                #     n = int((len(tif_images) / float(GPU_NUM)) + 0.5)
+                #     patches = [tif_images[i: i + n] for i in range(0, len(tif_images), n)]
+                #
+                #     for gpu_index, patch in enumerate(patches):
+                #         tasks.append(executor.submit(yolo_predict, str(gpu_index), patch))
+                #
+                # seg_results = {}
+                # for future in as_completed(tasks):
+                #     result = future.result()
+                #     if not isinstance(result, 'dict'):
+                #         print(result)
+                #
+                #     seg_results.update(result)
+                #
+                # # 关闭进程池
+                # executor.shutdown(wait=True)
 
                 # WRITE DATA TO CSV
                 xcep_pre.write_csv(seg_results, seg_csv)
