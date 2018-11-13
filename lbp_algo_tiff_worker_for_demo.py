@@ -9,10 +9,11 @@ from common.tslide.tslide import TSlide
 from common.utils import ImageSlice
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
+from models.final_diagnose.diagnose import gen_slide_diagnose
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
-from utils import FilesScanner
+from utils import FilesScanner, gen_tiff_label_to_db, gen_tiff_diagnose_to_db
 
 GPU_NUM = len(os.popen("lspci|grep VGA|grep NVIDIA").read().split('\n')) - 1
 
@@ -101,7 +102,7 @@ class PCK:
                 tasks = []
 
                 # 创建切图进程池
-                executor = ProcessPoolExecutor(max_workers=GPU_NUM * 2)
+                executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
                 if len(tif_images) < cfg.darknet.min_job_length:
                     tasks.append(executor.submit(yolo_predict, '0', tif_images))
@@ -133,7 +134,7 @@ class PCK:
             ##################################### XCEPTION 处理 #################################################
             tasks = []
             # 创建切图进程池
-            executor = ProcessPoolExecutor(max_workers=GPU_NUM * 2)
+            executor = ProcessPoolExecutor(max_workers=GPU_NUM)
 
             if len(cell_lst) < cfg.xception.min_job_length:
                 tasks.append(executor.submit(xception_predict, '0', np.asarray(cell_lst)))
@@ -165,13 +166,11 @@ class PCK:
             clas_csv = os.path.join(self.meta_files_path, tiff_basename + '_clas.csv')
             clas.write_csv(clas_dict, clas_csv)
 
-            ############################### 生成审核图像 ######################################################
-            # GET VIEW CELL IMAGES
-            clas.cut_cells_p_marked(tiff, clas_dict, self.cells_path, factor=0.2, N=1)
-            t4 = datetime.datetime.now()
-            print("GET VIEW IMAGES COST %s" % (t4 - t3))
+            # 更新诊断信息
+            gen_tiff_diagnose_to_db(os.path.basename(tiff), gen_slide_diagnose(clas_csv))
 
-            print("TIFF %s TOTAL COST %s ..." % (tiff_basename, t4 - t0))
+            # # 更新标记信息
+            # gen_tiff_label_to_db(clas_csv)
 
 
 if __name__ == "__main__":
