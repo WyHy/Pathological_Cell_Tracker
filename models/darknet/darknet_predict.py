@@ -15,11 +15,15 @@ class DarknetPredict:
         self.hier_thresh = cfg.darknet.hier_thresh
         self.nms = cfg.darknet.nms
 
-        self.gen_datacfg_file()
+        try:
+            self.gen_datacfg_file()
+            self.net = load_net(cfg.darknet.cfg_file.encode('utf-8'), cfg.darknet.weights_file.encode('utf-8'), 0)
+            self.meta = load_meta(cfg.darknet.datacfg_file.encode('utf-8'))
+            self.pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
+        except Exception as e:
+            print(e)
+            exit()
 
-        self.net = load_net(cfg.darknet.cfg_file.encode('utf-8'), cfg.darknet.weights_file.encode('utf-8'), 0)
-        self.meta = load_meta(cfg.darknet.datacfg_file.encode('utf-8'))
-        self.pattern = re.compile(r'(.*?)_(\d+)_(\d+)$')
 
     def gen_datacfg_file(self):
         # for minitest.data
