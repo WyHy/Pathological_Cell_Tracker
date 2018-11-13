@@ -417,21 +417,19 @@ def gen_tiff_diagnose_to_db(tiff_name, result):
     header = {"Authorization": "JWT %s" % get_jwt('convert')}
 
     image = None
-    for item in ['.kfb', '.tif']:
-        response = requests.get('http://%s/api/v1/images/?name=%s' % (HOST, tiff_name + item), headers=header)
-        if response.status_code == 200 and response.json():
-            data = response.json()
-            if data:
-                image = data[0]['id']
-                break
-    else:
-        raise Exception("NO TIFF NAMED %s" % tiff_name)
+    response = requests.get('http://%s/api/v1/images/?name=%s' % (HOST, tiff_name), headers=header)
+    if response.status_code == 200 and response.json():
+        data = response.json()
+        if data:
+            image = data[0]['id']
+        else:
+            raise Exception("NO TIFF NAMED %s" % tiff_name)
 
     result = {
         "result_auto": result,
     }
     response = requests.patch('http://%s/api/v1/images/%s/' % (HOST, image), json=result, headers=header)
-    if response.status_code == 201:
+    if response.status_code == 200:
         pass
     else:
         raise Exception(response.json())
