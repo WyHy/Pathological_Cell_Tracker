@@ -12,26 +12,26 @@ GLAND_CELL_CATEGORY = ['EC', 'AGC']
 INFECT_CELL_CATEGORY = ["FUNGI", "TRI", "CC", "ACTINO", "VIRUS"]
 
 IMPACT_CATEGORY_THRESH_DICT = {
-    "LSIL": 0.7,
-    "HSIL": 0.7,
-    "SCC": 0.7,
-    "ASCUS": 0.7,
-    "ASCH": 0.7,
+    "LSIL": 0.9,
+    "HSIL": 0.9,
+    "SCC": 0.9,
+    "ASCUS": 0.9,
+    "ASCH": 0.9,
 
-    "LSIL_F": 0.7,
-    "LSIL_E": 0.7,
-    "HSIL_S": 0.7,
-    "HSIL_M": 0.7,
-    "HSIL_B": 0.7,
-    "SCC_G": 0.7,
-    "SCC_R": 0.7,
-    "EC": 0.7,
-    "AGC": 0.7,
-    "FUNGI": 0.7,
-    "TRI": 0.7,
-    "CC": 0.7,
-    "ACTINO": 0.7,
-    "VIRUS": 0.7,
+    "LSIL_F": 0.9,
+    "LSIL_E": 0.9,
+    "HSIL_S": 0.9,
+    "HSIL_M": 0.9,
+    "HSIL_B": 0.9,
+    "SCC_G": 0.9,
+    "SCC_R": 0.9,
+    "EC": 0.9,
+    "AGC": 0.9,
+    "FUNGI": 0.9,
+    "TRI": 0.9,
+    "CC": 0.9,
+    "ACTINO": 0.9,
+    "VIRUS": 0.9,
 }
 
 IMPACT_CATEGORY_CELL_COUNT_DICT = {
@@ -194,9 +194,14 @@ def gen_categories_abnormal_14(points_lst, threshes_dict):
     for point in points_lst:
         label_yolo, acc_yolo, label_xcp, acc_xcp = point['yolo']['label'], point['yolo']['accuracy'], point['xception']['label'], point['xception']['accuracy']
         if label_yolo != label_xcp:
-            continue
+            if label_xcp in NORMAL_CATEGORY:
+                continue
 
-        p_mix = (acc_yolo + acc_xcp) / 2
+            pass
+
+        # p_mix = (acc_yolo + acc_xcp) / 2
+        p_mix = (acc_xcp + acc_xcp) / 2
+
         if p_mix > threshes_dict[label_xcp]:
             abnormal_dict[label_xcp].append(point)
 
@@ -228,6 +233,11 @@ def slide_diagnose(points_lst, threshes_dict):
     clas_18 = gen_categories_18(points_lst, threshes_dict)
     result = diagnose_from_categories_18(clas_18)
 
+    return result
+
+
+def gen_slide_diagnose(csv_path):
+    result = slide_diagnose(read_clas_xmls(csv_path), IMPACT_CATEGORY_THRESH_DICT)
     return result
 
 
