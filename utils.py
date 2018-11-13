@@ -1,9 +1,11 @@
 # coding: utf-8
+import csv
 import datetime
 import os
 import re
 import shutil
 import openslide
+import requests
 
 import xlrd
 
@@ -348,6 +350,92 @@ def worker(tiff_path, keys, points_dict, save_path, N):
     slide.close()
 
     return cell_count
+
+
+jwt_cache = {}
+HOST = '192.168.2.148'
+
+
+def get_jwt(open_id):
+    if open_id not in jwt_cache:
+        login_url = 'http://%s/api/v1/auth_token/' % HOST
+        response = requests.post(login_url, json={'username': 'convert', 'password': 'tsimage666'})
+        if response.status_code != 200:
+            raise Exception('can not logins', response.json())
+        jwt_cache[open_id] = 'JWT {}'.format(response.json()['token'])
+    return jwt_cache[open_id]
+
+
+def gen_tiff_label_to_db(path):
+    header = {"Authorization": "JWT %s" % get_jwt('convert')}
+
+    with open(path) as f:
+        tiff_name = os.path.splitext(os.path.basename(path))[0]
+        tiff_name = tiff_name.replace("_clas", '')
+
+        print("Processing on %s..." % tiff_name)
+
+        image = None
+        for item in ['.kfb', '.tif']:
+            response = requests.get('http://%s/api/v1/images/?name=%s' % (HOST, tiff_name + item), headers=header)
+            if response.status_code == 200 and response.json():
+                data = response.json()
+                if data:
+                    image = data[0]['id']
+                    break
+        else:
+            raise Exception("NO TIFF NAMED %s" % tiff_name)
+
+        reader = csv.reader(f, delimiter=',')
+        next(reader)
+
+        for line in reader:
+            x_y, label_yolo, accuracy_yolo, label_xception, accuracy_xception, xmin, ymin, xmax, ymax = line
+            x0, y0 = x_y.split('_')
+            x0, y0, accuracy, xmin, ymin, xmax, ymax = int(x0), int(y0), float(accuracy_xception), float(xmin), float(ymin), float(xmax), float(ymax)
+            x, y, w, h = x0 + xmin, y0 + ymin, xmax - xmin, ymax - ymin
+
+            label = {
+                'image': image,
+                'cell_type': label_xception,
+                'accuracy': accuracy,
+                'x': x,
+                'y': y,
+                'w': w,
+                'h': h,
+                'source_type': "AI",
+            }
+
+            response = requests.post('http://%s/api/v1/labels/' % HOST, json=label, headers=header)
+            if response.status_code == 201:
+                pass
+            else:
+                raise Exception(response.json())
+
+
+def gen_tiff_diagnose_to_db(tiff_name, result):
+    header = {"Authorization": "JWT %s" % get_jwt('convert')}
+
+    image = None
+    for item in ['.kfb', '.tif']:
+        response = requests.get('http://%s/api/v1/images/?name=%s' % (HOST, tiff_name + item), headers=header)
+        if response.status_code == 200 and response.json():
+            data = response.json()
+            if data:
+                image = data[0]['id']
+                break
+    else:
+        raise Exception("NO TIFF NAMED %s" % tiff_name)
+
+    result = {
+        "result_auto": result,
+    }
+    response = requests.patch('http://%s/api/v1/images/%s/' % (HOST, image), json=result, headers=header)
+    if response.status_code == 201:
+        pass
+    else:
+        raise Exception(response.json())
+
 
 if __name__ == '__main__':
     # clas_files_path = '/home/tsimage/Development/DATA/meta'
