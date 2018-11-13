@@ -9,7 +9,7 @@ from common.tslide.tslide import TSlide
 from common.utils import ImageSlice
 from config.config import *
 from models.darknet.darknet_predict import DarknetPredict
-from models.final_diagnose.logical_output import gen_slide_diagnose
+from models.final_diagnose.diagnose import gen_slide_diagnose
 from models.xception.xception_postprocess import XceptionPostprocess
 from models.xception.xception_predict import XceptionPredict
 from models.xception.xception_preprocess import XceptionPreprocess
