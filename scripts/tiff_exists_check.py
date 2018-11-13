@@ -63,7 +63,11 @@ def get_and_download(file_path):
             if item in local_tiff_dict:
                 remote_file_path = local_tiff_dict[item]
             else:
-                remote_file_path = remote_tiff_dict[item]
+                try:
+                    remote_file_path = remote_tiff_dict[item]
+                except:
+                    print("%s NOT FOUND " % item)
+                    continue
 
             print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
             shutil.copy(remote_file_path, TIFF_FILES_PATH)
@@ -103,6 +107,6 @@ def collect_useful_tiff_by_txt(path):
 if __name__ == '__main__':
     # 检查文件名是否有重复
     # tiff_readable_check(REMOTE_TIFF_PATH)
-    # get_and_download('work_tiff_list_20181109_SELECTED.txt')
+    get_and_download('work_tiff_lst_20181113.txt')
 
-    collect_useful_tiff_by_txt('work_tiff_list_20181109_SELECTED.txt')
+    # collect_useful_tiff_by_txt('work_tiff_list_20181109_SELECTED.txt')
