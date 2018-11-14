@@ -6,10 +6,14 @@ ABNORMAL_CATEGORY = ["LSIL", "HSIL", "SCC", "ASCUS", "ASCH",
                      "LSIL_F", "LSIL_E", "HSIL_S", "HSIL_M", "HSIL_B", "SCC_G", "SCC_R", "EC", "AGC", "FUNGI", "TRI",
                      "CC", "ACTINO", "VIRUS"]
 
-SQUA_CELL_CATEGORY = ["LSIL", "HSIL", "SCC", "ASCUS", "ASCH",
-                      "LSIL_F", "LSIL_E", "HSIL_S", "HSIL_M", "HSIL_B", "SCC_G", "SCC_R"]
+SQUA_CELL_CATEGORY = ["LSIL", "HSIL", "SCC", "ASCH",
+                      "ASCUS", "LSIL_F", "LSIL_E", "HSIL_S", "HSIL_M", "HSIL_B", "SCC_G", "SCC_R"]
 GLAND_CELL_CATEGORY = ['EC', 'AGC']
 INFECT_CELL_CATEGORY = ["FUNGI", "TRI", "CC", "ACTINO", "VIRUS"]
+
+SQUA_THRESH = 0
+INFECT_THRESH = 50
+GRAND_THRESH = 20
 
 IMPACT_CATEGORY_THRESH_DICT = {
     "LSIL": 0.9,
@@ -35,23 +39,23 @@ IMPACT_CATEGORY_THRESH_DICT = {
 }
 
 IMPACT_CATEGORY_CELL_COUNT_DICT = {
-    "LSIL": 30,
+    "LSIL": 250,
     "HSIL": 5,
     "SCC": 7,
     "ASCUS": 30,
     "ASCH": 10,
 
-    "LSIL_F": 30,
-    "LSIL_E": 5,
-    "HSIL_S": 5,
-    "HSIL_M": 10,
-    "HSIL_B": 3,
+    "LSIL_F": 17,
+    "LSIL_E": 4,
+    "HSIL_S": 7,
+    "HSIL_M": 5,
+    "HSIL_B": 5,
     "SCC_G": 7,
     "SCC_R": 7,
     "EC": 3,
     "AGC": 10,
     "FUNGI": 5,
-    "TRI": 150,
+    "TRI": 300,
     "CC": 300,
     "ACTINO": 150,
     "VIRUS": 150,
@@ -90,7 +94,7 @@ def read_clas_xmls(csv_path):
     return points_lst
 
 
-def squa_decision(clas_18, cell_count_dict, thr=5):
+def squa_decision(clas_18, cell_count_dict, thr=SQUA_THRESH):
     """
 
     :param clas_18:
@@ -101,42 +105,111 @@ def squa_decision(clas_18, cell_count_dict, thr=5):
 
     for item in SQUA_CELL_CATEGORY:
         cell_count = len(clas_18[item])
-        if cell_count < thr:
+        if cell_count <= thr:
             continue
 
         impact_category_dict[item] = cell_count
 
     if not impact_category_dict:
         return None
-    print(impact_category_dict)
+    # print(impact_category_dict)
 
     impact_category_lst = sorted(impact_category_dict.items(), key=lambda category: category[1], reverse=True)
+    print(impact_category_lst)
+
+    if 'SCC_R' in impact_category_dict and impact_category_dict['SCC_R'] >= cell_count_dict['SCC_R']:
+        return "SCC", impact_category_lst
+
+    if 'SCC_G' in impact_category_dict and impact_category_dict['SCC_G'] >= cell_count_dict['SCC_G']:
+        return "SCC", impact_category_lst
+
+    if 'HSIL_S' in impact_category_dict and impact_category_dict['HSIL_S'] >= cell_count_dict['HSIL_S']:
+        return "HSIL", impact_category_lst
+
+    if 'LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] >= cell_count_dict['LSIL_E']:
+        return "LSIL", impact_category_lst
+
+    if impact_category_lst[0][0] == 'ASCUS':
+        if 'LSIL_F' in impact_category_dict and impact_category_dict['LSIL_F'] >= cell_count_dict['LSIL']:
+            return "LSIL", impact_category_lst
+
+        if 'LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] >= cell_count_dict['LSIL_E']:
+            return 'LSIL', impact_category_lst
+
+        if ('LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] < cell_count_dict['LSIL_E']) and (
+                'LSIL_F' in impact_category_dict and impact_category_dict['LSIL_F'] < cell_count_dict['LSIL_F']):
+            return 'ASCUS', impact_category_lst
+
+        if ('LSIL_E' not in impact_category_dict or (
+                'LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] < cell_count_dict['LSIL_E'])) and (
+                'LSIL_F' not in impact_category_dict or (
+                'LSIL_F' in impact_category_dict and impact_category_dict['LSIL_F'] < cell_count_dict['LSIL_F'])):
+            return "NORMAL", impact_category_lst
+
+        return 'ASCUS', impact_category_lst
+
     if impact_category_lst[0][0] == 'LSIL_E':
         return 'LSIL', impact_category_lst
 
     if impact_category_lst[0][0] == 'LSIL_F':
-        if 'LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] > 2 * thr:
+        if 'HSIL_B' in impact_category_dict and impact_category_dict['HSIL_B'] >= cell_count_dict['HSIL_B']:
+            return "ASCH", impact_category_lst
+
+        if 'HSIL_M' in impact_category_dict and impact_category_dict['HSIL_M'] >= cell_count_dict['HSIL_M']:
+            return "ASCH", impact_category_lst
+
+        if 'LSIL_E' in impact_category_dict and impact_category_dict['LSIL_E'] >= cell_count_dict['LSIL_E']:
             return 'LSIL', impact_category_lst
+
+        if impact_category_dict['LSIL_F'] < cell_count_dict['LSIL_F'] and "ASCUS" not in impact_category_dict:
+            return None
+
+        if impact_category_dict['LSIL_F'] >= cell_count_dict['LSIL']:
+            return "LSIL", impact_category_lst
+
         return 'ASCUS', impact_category_lst
 
     if impact_category_lst[0][0] == 'HSIL_S':
+        if ('SCC_R' in impact_category_dict and impact_category_dict['SCC_R'] >= cell_count_dict['SCC_R']) or (
+                'SCC_G' in impact_category_dict and impact_category_dict['SCC_G'] >= cell_count_dict['SCC_G']):
+            return 'SCC', impact_category_lst
+
         return 'HSIL', impact_category_lst
 
-    if impact_category_lst[0][0] == 'HSIL_M' or impact_category_lst[0][0] == 'HSIL_B':
+    if impact_category_lst[0][0] == 'HSIL_M':
+        if ('SCC_R' in impact_category_dict and impact_category_dict['SCC_R'] >= cell_count_dict['SCC_R']) or (
+                'SCC_G' in impact_category_dict and impact_category_dict['SCC_G'] >= cell_count_dict['SCC_G']):
+            return 'SCC', impact_category_lst
+
         if 'HSIL_S' in impact_category_dict:
-            if impact_category_dict['HSIL_S'] > 2 * thr:
+            if impact_category_dict['HSIL_S'] >= cell_count_dict['HSIL_S']:
                 return 'HSIL', impact_category_lst
             else:
                 return "ASCH", impact_category_lst
-        return None
 
-    if impact_category_lst[0][0] in ['SCC_G', 'SCC_R']:
-        return "SCC", impact_category_lst
+    if impact_category_lst[0][0] == 'HSIL_B':
+        if ('SCC_R' in impact_category_dict and impact_category_dict['SCC_R'] >= cell_count_dict['SCC_R']) or (
+                'SCC_G' in impact_category_dict and impact_category_dict['SCC_G'] >= cell_count_dict['SCC_G']):
+            return 'SCC', impact_category_lst
+
+        if 'HSIL_S' in impact_category_dict:
+            if impact_category_dict['HSIL_S'] >= cell_count_dict['HSIL_S']:
+                return 'HSIL', impact_category_lst
+            else:
+                return "ASCH", impact_category_lst
+
+    if impact_category_lst[0][0] == 'SCC_G':
+        if impact_category_dict['SCC_G'] >= cell_count_dict['SCC_G']:
+            return 'SCC', impact_category_lst
+
+    if impact_category_lst[0][0] == 'SCC_R':
+        if impact_category_dict['SCC_R'] >= cell_count_dict['SCC_R']:
+            return 'SCC', impact_category_lst
 
     return None
 
 
-def infect_decision(clas_18, cell_count_dict, thr=150):
+def infect_decision(clas_18, cell_count_dict, thr=INFECT_THRESH):
     """
 
     :param clas_18:
@@ -148,15 +221,15 @@ def infect_decision(clas_18, cell_count_dict, thr=150):
 
     for item in INFECT_CELL_CATEGORY:
         cell_count = len(clas_18[item])
-        # if cell_count > cell_count_dict[item]:
-        if cell_count > category_max_count:
+        # if cell_count >= cell_count_dict[item]:
+        if cell_count >= category_max_count:
             category_max_label = item
             category_max_count = cell_count
 
     return (category_max_label, category_max_count) if category_max_label else None
 
 
-def gland_decision(clas_18, cell_count_dict, thr=20):
+def gland_decision(clas_18, cell_count_dict, thr=GRAND_THRESH):
     """
 
     :param clas_18:
@@ -168,8 +241,8 @@ def gland_decision(clas_18, cell_count_dict, thr=20):
 
     for item in GLAND_CELL_CATEGORY:
         cell_count = len(clas_18[item])
-        # if cell_count > cell_count_dict[item]:
-        if cell_count > category_max_count:
+        # if cell_count >= cell_count_dict[item]:
+        if cell_count >= category_max_count:
             category_max_label = item
             category_max_count = cell_count
 
@@ -235,7 +308,7 @@ def gen_categories_abnormal_14(points_lst, threshes_dict):
         # p_mix = (acc_yolo + acc_xcp) / 2
         p_mix = (acc_xcp + acc_xcp) / 2
 
-        if p_mix > threshes_dict[label_xcp]:
+        if p_mix >= threshes_dict[label_xcp]:
             abnormal_dict[label_xcp].append(point)
 
     return abnormal_dict
@@ -274,10 +347,12 @@ def gen_slide_diagnose(csv_path):
 
 
 if __name__ == '__main__':
-    csv_path = 'C:/Users/graya/Desktop/test'
+    csv_path = 'C:/Users/graya/Desktop/META'
     files = os.listdir(csv_path)
     for file in files:
-        points_lst = read_clas_xmls(os.path.join(csv_path, file))
-        result = slide_diagnose(points_lst, IMPACT_CATEGORY_THRESH_DICT)
+        if file.endswith("_clas.csv"):
+            points_lst = read_clas_xmls(os.path.join(csv_path, file))
+            result = slide_diagnose(points_lst, IMPACT_CATEGORY_THRESH_DICT)
 
-        print(file, result)
+            print(file, result)
+            print("-----------------------")
