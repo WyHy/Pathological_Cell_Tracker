@@ -169,8 +169,8 @@ class PCK:
             # 更新诊断信息
             gen_tiff_diagnose_to_db(os.path.basename(tiff), gen_slide_diagnose(clas_csv))
 
-            # # 更新标记信息
-            # gen_tiff_label_to_db(clas_csv)
+            # 更新标记信息
+            gen_tiff_label_to_db(clas_csv)
 
 
 if __name__ == "__main__":
