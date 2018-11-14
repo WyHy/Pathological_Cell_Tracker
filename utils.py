@@ -390,10 +390,10 @@ def gen_tiff_label_to_db(path):
         next(reader)
 
         for line in reader:
-            x_y, label_yolo, accuracy_yolo, label_xception, accuracy_xception, xmin, ymin, xmax, ymax = line
+            x_y, label_yolo, accuracy_yolo, label_xception, accuracy_xception, xmin, ymin, w, h = line
             x0, y0 = x_y.split('_')
-            x0, y0, accuracy, xmin, ymin, xmax, ymax = int(x0), int(y0), float(accuracy_xception), float(xmin), float(ymin), float(xmax), float(ymax)
-            x, y, w, h = x0 + xmin, y0 + ymin, xmax - xmin, ymax - ymin
+            x0, y0, accuracy, xmin, ymin, w, h = int(x0), int(y0), float(accuracy_xception), float(xmin), float(ymin), float(w), float(h)
+            x, y, w, h = x0 + xmin, y0 + ymin, w, h
 
             label = {
                 'image': image,
