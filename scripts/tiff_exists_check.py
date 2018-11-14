@@ -62,26 +62,18 @@ def get_and_download(file_path):
             miss_tiff_lst.append(item)
             if item in local_tiff_dict:
                 remote_file_path = local_tiff_dict[item]
+                print("MOVE FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
+                shutil.move(remote_file_path, TIFF_FILES_PATH)
             else:
                 try:
                     remote_file_path = remote_tiff_dict[item]
+                    print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
+                    shutil.copy(remote_file_path, TIFF_FILES_PATH)
                 except:
                     print("%s NOT FOUND " % item)
                     continue
-
-            print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
-            shutil.copy(remote_file_path, TIFF_FILES_PATH)
-            # raise Exception('TIFF %s IS NOT FOUND IN LOCAL RESOURCE' % item)
         else:
             print("%s IS ALREADY EXIST!" % item)
-        # path = tiff_dict[item]
-        # try:
-        #     try:
-        #         slide = openslide.OpenSlide(path)
-        #     except:
-        #         slide = TSlide(path)
-        # except Exception as e:
-        #     raise Exception("%s %s" % (item, str(e)))
 
     print('\n'.join(miss_tiff_lst))
 
