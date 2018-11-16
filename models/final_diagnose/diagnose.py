@@ -352,6 +352,7 @@ if __name__ == '__main__':
     for file in files:
         if file.endswith("_clas.csv"):
             points_lst = read_clas_xmls(os.path.join(csv_path, file))
+
             result = slide_diagnose(points_lst, IMPACT_CATEGORY_THRESH_DICT)
 
             print(file, result)
