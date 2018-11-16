@@ -20,7 +20,7 @@ def get_game_status(tiff_dir_path, resource_save_path):
     header = {"Authorization": "JWT %s" % get_jwt('convert')}
 
     while 1:
-        response = requests.get('http://%s/api/v1/game/', headers=header)
+        response = requests.get('http://%s/api/v1/game/' % HOST, headers=header)
         if response.status_code == 200 and response.json():
             data = response.json()
             status = data['status']
