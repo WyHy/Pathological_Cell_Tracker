@@ -173,6 +173,29 @@ class PCK:
             gen_tiff_label_to_db(clas_csv)
 
 
+def worker(tiff_dir_path, resource_save_path):
+    # 切图文件存储路径
+    slice_dir_path = os.path.join(resource_save_path, 'SLICE')
+
+    # 中间文件存放目录
+    meta_files_path = os.path.join(resource_save_path, 'META')
+
+    # 识别出的细胞存储路径
+    cells_save_path = os.path.join(resource_save_path, 'CELLS')
+
+    tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
+
+    for item in [slice_dir_path, meta_files_path, cells_save_path]:
+        if not os.path.exists(item):
+            os.makedirs(item)
+
+    PCK(tiff_lst, slice_dir_path, meta_files_path, cells_save_path).run()
+    print("PLEASE GET CELL IMAGES IN %s" % cells_save_path)
+
+    t1 = datetime.datetime.now()
+    print("TIFF NUM: %s， TOTAL COST %s ..." % (len(tiff_lst), (t1 - t0)))
+
+
 if __name__ == "__main__":
     # wanna test?
     test = False
