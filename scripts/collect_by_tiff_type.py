@@ -29,8 +29,12 @@ def do_collect_by_tiff_type(path, dict_):
         src_root_dir = os.path.join(path, tiff)
         types = os.listdir(src_root_dir)
         for item in types:
+            if tiff in dict_:
+                label = dict_[tiff]
+            else:
+                label = "Unknown"
             src_path = os.path.join(src_root_dir, item)
-            dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', dict_[tiff], tiff, item)
+            dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', label, tiff, item)
             shutil.copytree(src_path, dst_path)
 
 
