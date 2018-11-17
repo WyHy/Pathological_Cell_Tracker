@@ -33,6 +33,8 @@ def do_collect_by_tiff_type(path, dict_):
                 label = dict_[tiff]
             else:
                 label = "Unknown"
+
+            label = label.replace("/", "-")
             src_path = os.path.join(src_root_dir, item)
             dst_path = os.path.join(os.path.dirname(path), 'TO_BE_CHECK_CELLS', label, tiff, item)
             shutil.copytree(src_path, dst_path)
