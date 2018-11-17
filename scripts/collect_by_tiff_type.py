@@ -35,6 +35,6 @@ def do_collect_by_tiff_type(path, dict_):
 
 
 if __name__ == '__main__':
-    cell_path = '/home/cnn/Development/DATA/PRODUCTION_FULL_TEST/CELLS'
+    cell_path = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/201811132110_FULL_TEST/CELLS'
     dict_path = 'name_and_labels_production_test.txt'
     do_collect_by_tiff_type(cell_path, load_dict(dict_path))
