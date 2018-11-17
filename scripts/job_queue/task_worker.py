@@ -1,7 +1,11 @@
+import os
 import queue
 import time
 from multiprocessing.managers import BaseManager
 
+from utils import generate_name_path_dict
+
+SLIDE_STORAGE_PATH = ""
 
 # 创建类似的QueueManager:
 class QueueManager(BaseManager):
@@ -27,11 +31,14 @@ if __name__ == '__main__':
     task = m.get_task_queue()
     result = m.get_result_queue()
 
+    dict_ = generate_name_path_dict(SLIDE_STORAGE_PATH)
+
     # 从task队列取任务,并把结果写入result队列:
     while 1:
         try:
             obj = task.get(timeout=1)
-            print('Run Task Image Id = %s...' % obj['id'])
+            basename = os.path.splitext(os.path.basename(obj['name']))
+            print('Run Task Image Id = %s...\nPath=%s' % (obj['id'], dict_[basename]))
             time.sleep(1)
             result.put({'id': obj['id'], 'status': 1})
         except queue.Empty:
