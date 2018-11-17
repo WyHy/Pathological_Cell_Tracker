@@ -52,7 +52,7 @@ __C.darknet.min_overlap_ratio = 0.6
 __C.xception = edict()
 __C.xception.det1 = -0.05  # used in gen_np_array
 __C.xception.size = 299
-__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_60.h5")
+__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_1114_finetune_45.h5")
 # __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune.h5")
 
 # __C.xception.classes = ["ACTINO", "AGC", "ASCH", "ASCUS", "CC", "EC", "FUNGI",
