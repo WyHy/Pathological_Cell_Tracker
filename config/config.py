@@ -58,7 +58,7 @@ __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_1114
 # __C.xception.classes = ["ACTINO", "AGC", "ASCH", "ASCUS", "CC", "EC", "FUNGI",
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 
-__C.xception.classes = ["ACTINO", "AGC", "CC", "EC", "FUNGI", "GEC", "HSIL_B", "HSIL_M", "HSIL_S", "LSIL_E", "LSIL_F", "MC", "RC", "SC", "SCC_G", "SCC_R", "TRI", "VIRUS"]
+__C.xception.classes = ["ACTINO", "AGC", "ASCUS", "CC", "EC", "FUNGI", "GEC", "HSIL_B", "HSIL_M", "HSIL_S", "LSIL_E", "LSIL_F", "MC", "RC", "SC", "SCC_G", "SCC_R", "TRASH", "TRI", "VIRUS"]
 
 __C.xception.class_num = 18
 
