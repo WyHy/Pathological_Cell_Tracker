@@ -4,35 +4,36 @@ import os
 
 import xlrd
 
-# 打开指定路径中的xls文件
-xlsfile = "./usable_slides_info_scanDateNew.xlsx"
 
-# 得到Excel文件的book对象，实例化对象
-book = xlrd.open_workbook(xlsfile)
+def read_xls(path):
+    # 打开指定路径中的xls文件
+    xlsfile = "./40张_河南.xlsx"
 
-# 通过sheet索引获得sheet对象
-sheet0 = book.sheet_by_index(0)
+    # 得到Excel文件的book对象，实例化对象
+    book = xlrd.open_workbook(path)
 
-# 获得指定索引的sheet表名字
-sheet_name = book.sheet_names()[0]
+    # 通过sheet索引获得sheet对象
+    sheet0 = book.sheet_by_index(0)
 
-# 通过sheet名字来获取，当然如果知道sheet名字就可以直接指定
-sheet1 = book.sheet_by_name(sheet_name)
+    # 获得指定索引的sheet表名字
+    sheet_name = book.sheet_names()[0]
 
-# 获取行总数
-nrows = sheet0.nrows
+    # 通过sheet名字来获取，当然如果知道sheet名字就可以直接指定
+    sheet1 = book.sheet_by_name(sheet_name)
 
-ids = []
-dict_ = {}
-for i in range(1, nrows):
-    file_name, file_path, ID_dateMatch, ID_fileMatch, ID, ZHU_Dignosis, Doctor_Diagnosis, *_ = sheet1.row_values(i)
+    # 获取行总数
+    nrows = sheet0.nrows
 
-    basename, _ = os.path.splitext(os.path.basename(file_name))
-    dict_[basename] = {'zhu': ZHU_Dignosis, 'doctor': Doctor_Diagnosis}
+    dict_ = {}
+    for i in range(1, nrows):
+        key, label, *_ = sheet1.row_values(i)
+        dict_[key] = label
 
-with open('DIAGNOSE_RESULT_DICT.txt', 'w') as o:
-    for key, value in dict_.items():
-        o.write("%s\t%s\n" % (key.encode('utf-8').decode('utf-8'), json.dumps(value)))
+    return dict_
+
+    # with open('DIAGNOSE_RESULT_DICT.txt', 'w') as o:
+    #     for key, value in dict_.items():
+    #         o.write("%s\t%s\n" % (key.encode('utf-8').decode('utf-8'), json.dumps(value)))
 
 # with open('DIAGNOSE_RESULT_DICT.txt') as f:
 #     lines = f.readlines()

@@ -1,10 +1,12 @@
 import csv
 import os
 
+import xlrd
+
 NORMAL_CATEGORY = ["MC", 'RC', 'SC', 'GEC']
 ABNORMAL_CATEGORY = ["LSIL", "HSIL", "SCC", "ASCUS", "ASCH",
                      "LSIL_F", "LSIL_E", "HSIL_S", "HSIL_M", "HSIL_B", "SCC_G", "SCC_R", "EC", "AGC", "FUNGI", "TRI",
-                     "CC", "ACTINO", "VIRUS"]
+                     "CC", "ACTINO", "VIRUS", "ASCUS", "TRASH"]
 
 SQUA_CELL_CATEGORY = ["LSIL", "HSIL", "SCC", "ASCH",
                       "ASCUS", "LSIL_F", "LSIL_E", "HSIL_S", "HSIL_M", "HSIL_B", "SCC_G", "SCC_R"]
@@ -36,6 +38,8 @@ IMPACT_CATEGORY_THRESH_DICT = {
     "CC": 0.9,
     "ACTINO": 0.9,
     "VIRUS": 0.9,
+    "ASCUS": 0.9,
+    "TRASH": 0.0,
 }
 
 IMPACT_CATEGORY_CELL_COUNT_DICT = {
@@ -59,7 +63,33 @@ IMPACT_CATEGORY_CELL_COUNT_DICT = {
     "CC": 300,
     "ACTINO": 150,
     "VIRUS": 150,
+    "ASCUS": 1,
+    "TRASH": 1,
 }
+
+
+def read_xls(path):
+    # 得到Excel文件的book对象，实例化对象
+    book = xlrd.open_workbook(path)
+
+    # 通过sheet索引获得sheet对象
+    sheet0 = book.sheet_by_index(0)
+
+    # 获得指定索引的sheet表名字
+    sheet_name = book.sheet_names()[0]
+
+    # 通过sheet名字来获取，当然如果知道sheet名字就可以直接指定
+    sheet1 = book.sheet_by_name(sheet_name)
+
+    # 获取行总数
+    nrows = sheet0.nrows
+
+    dict_ = {}
+    for i in range(1, nrows):
+        key, label = sheet1.row_values(i)
+        dict_[key] = label
+
+    return dict_
 
 
 def read_clas_xmls(csv_path):
@@ -259,9 +289,9 @@ def diagnose_from_categories_18(clas_18):
     res_infect = infect_decision(clas_18, IMPACT_CATEGORY_CELL_COUNT_DICT)
     res_gland = gland_decision(clas_18, IMPACT_CATEGORY_CELL_COUNT_DICT)
 
-    print(res_squa)
-    print(res_infect)
-    print(res_gland)
+    print("Squa Result: ", res_squa)
+    print("Infect Result: ", res_infect)
+    print("Gland Result: ", res_gland)
 
     result = "+".join([item[0] for item in [res_squa, res_infect, res_gland] if item])
 
@@ -349,11 +379,19 @@ def gen_slide_diagnose(csv_path):
 if __name__ == '__main__':
     csv_path = 'C:/Users/graya/Desktop/META'
     files = os.listdir(csv_path)
+
+    xls_path = "../../scripts/89张_河南大会.xlsx"
+    dict_ = read_xls(xls_path)
+
     for file in files:
-        if file.endswith("_clas.csv"):
-            points_lst = read_clas_xmls(os.path.join(csv_path, file))
+        basename, _ = os.path.splitext(os.path.basename(file))
+        basename = basename.replace("_clas", "")
+        if basename in dict_:
+            if file.endswith("_clas.csv"):
+                points_lst = read_clas_xmls(os.path.join(csv_path, file))
+                result = slide_diagnose(points_lst, IMPACT_CATEGORY_THRESH_DICT)
 
-            result = slide_diagnose(points_lst, IMPACT_CATEGORY_THRESH_DICT)
-
-            print(file, result)
-            print("-----------------------")
+                basename, _ = os.path.splitext(os.path.basename(file))
+                basename = basename.replace("_clas", "")
+                print("==> FileName: %s, Our: %s, Zhu: %s" % (file, result, dict_[basename]))
+                print("-----------------------")

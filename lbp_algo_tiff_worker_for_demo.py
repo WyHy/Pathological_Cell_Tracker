@@ -173,7 +173,7 @@ class PCK:
             gen_tiff_label_to_db(clas_csv)
 
 
-def worker(tiff_dir_path, resource_save_path):
+def slides_diagnose_worker(tiff_dir_path, resource_save_path):
     # 切图文件存储路径
     slice_dir_path = os.path.join(resource_save_path, 'SLICE')
 
