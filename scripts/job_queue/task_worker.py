@@ -14,7 +14,7 @@ if __name__ == '__main__':
     QueueManager.register('get_result_queue')
 
     # 连接到服务器，也就是运行task_master.py的机器:
-    master_address = '192.168.2.207'
+    master_address = '192.168.2.148'
     print('Connect to server %s...' % master_address)
 
     # 端口和验证码注意保持与task_master.py设置的完全一致:
