@@ -427,7 +427,7 @@ def gen_tiff_diagnose_to_db(tiff_name, result):
 
     result = {
         "result_auto": result,
-        'status': 'SUCCESS,'
+        'status': 'SUCCESS',
     }
     response = requests.patch('http://%s/api/v1/images/%s/' % (HOST, image), json=result, headers=header)
     if response.status_code == 200:
