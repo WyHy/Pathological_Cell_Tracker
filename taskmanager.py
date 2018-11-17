@@ -1,6 +1,6 @@
 import requests
 import time
-from lbp_algo_tiff_worker_for_demo import worker
+from lbp_algo_tiff_worker_for_demo import slides_diagnose_worker
 
 jwt_cache = {}
 HOST = '192.168.2.148'
@@ -25,7 +25,7 @@ def get_game_status(tiff_dir_path, resource_save_path):
             data = response.json()
             status = data['status']
             if status == 1:
-                worker(tiff_dir_path, resource_save_path)
+                slides_diagnose_worker(tiff_dir_path, resource_save_path)
             else:
                 time.sleep(3)
                 print("Waiting for game start ...")
