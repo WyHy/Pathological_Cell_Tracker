@@ -3,6 +3,9 @@ import queue
 import time
 from multiprocessing.managers import BaseManager
 
+import sys
+
+sys.path.append("../..")
 from utils import generate_name_path_dict
 
 SLIDE_STORAGE_PATH = ""
@@ -37,7 +40,7 @@ if __name__ == '__main__':
     while 1:
         try:
             obj = task.get(timeout=1)
-            basename = os.path.splitext(os.path.basename(obj['name']))
+            basename, _ = os.path.splitext(os.path.basename(obj['name']))
             print('Run Task Image Id = %s...\nPath=%s' % (obj['id'], dict_[basename]))
             time.sleep(1)
             result.put({'id': obj['id'], 'status': 1})
