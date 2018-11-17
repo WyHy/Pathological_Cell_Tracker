@@ -1,10 +1,7 @@
 import os
 import queue
-import sys
 import time
 from multiprocessing.managers import BaseManager
-
-sys.path.append("../..")
 from utils import generate_name_path_dict
 from lbp_algo_tiff_worker_for_demo import slides_diagnose_worker
 
