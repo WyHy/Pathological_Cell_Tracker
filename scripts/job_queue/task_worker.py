@@ -2,10 +2,13 @@ import os
 import queue
 import time
 from multiprocessing.managers import BaseManager
+import sys
+
+sys.path.append("../..")
 
 from utils import generate_name_path_dict
 
-SLIDE_STORAGE_PATH = ""
+SLIDE_STORAGE_PATH = "/home/stimage/Development/DATA/PRODUCTION_FULL_TEST/TIFFS/"
 
 # 创建类似的QueueManager:
 class QueueManager(BaseManager):
