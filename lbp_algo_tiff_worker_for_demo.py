@@ -173,7 +173,7 @@ class PCK:
             gen_tiff_label_to_db(clas_csv)
 
 
-def slides_diagnose_worker(tiff_dir_path, resource_save_path):
+def slides_diagnose_worker(tiff_lst, resource_save_path):
     # 切图文件存储路径
     slice_dir_path = os.path.join(resource_save_path, 'SLICE')
 
@@ -183,7 +183,7 @@ def slides_diagnose_worker(tiff_dir_path, resource_save_path):
     # 识别出的细胞存储路径
     cells_save_path = os.path.join(resource_save_path, 'CELLS')
 
-    tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
+    # tiff_lst = FilesScanner(tiff_dir_path, ['.kfb', '.tif']).get_files()
 
     for item in [slice_dir_path, meta_files_path, cells_save_path]:
         if not os.path.exists(item):
