@@ -1,17 +1,18 @@
 import os
 import queue
+import sys
 import time
 from multiprocessing.managers import BaseManager
 import sys
 
 sys.path.append("../..")
 
-import sys
-
 sys.path.append("../..")
 from utils import generate_name_path_dict
+from lbp_algo_tiff_worker_for_demo import slides_diagnose_worker
 
 SLIDE_STORAGE_PATH = "/home/stimage/Development/DATA/PRODUCTION_FULL_TEST/TIFFS/"
+
 
 # 创建类似的QueueManager:
 class QueueManager(BaseManager):
@@ -38,6 +39,7 @@ if __name__ == '__main__':
     result = m.get_result_queue()
 
     dict_ = generate_name_path_dict(SLIDE_STORAGE_PATH)
+    resource_save_path = '/home/cnn/Development/DATA/PRODUCTION_FULL_TEST/'
 
     # 从task队列取任务,并把结果写入result队列:
     while 1:
@@ -45,7 +47,8 @@ if __name__ == '__main__':
             obj = task.get(timeout=1)
             basename, _ = os.path.splitext(os.path.basename(obj['name']))
             print('Run Task Image Id = %s...\nPath=%s' % (obj['id'], dict_[basename]))
-            time.sleep(1)
+            slides_diagnose_worker([dict_[basename]], resource_save_path)
+
             result.put({'id': obj['id'], 'status': 1})
         except queue.Empty:
             time.sleep(5)
