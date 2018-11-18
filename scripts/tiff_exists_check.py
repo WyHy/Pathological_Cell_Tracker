@@ -59,7 +59,6 @@ def get_and_download(file_path):
     for index, item in enumerate(items):
         print("%s / %s" % (index + 1, total))
         if item not in tiff_dict:
-            miss_tiff_lst.append(item)
             if item in local_tiff_dict:
                 remote_file_path = local_tiff_dict[item]
                 print("MOVE FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
@@ -70,6 +69,7 @@ def get_and_download(file_path):
                     print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
                     shutil.copy(remote_file_path, TIFF_FILES_PATH)
                 except:
+                    miss_tiff_lst.append(item)
                     print("%s NOT FOUND " % item)
                     continue
         else:
