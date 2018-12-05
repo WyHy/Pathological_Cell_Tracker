@@ -34,7 +34,8 @@ __C.darknet = edict()
 __C.darknet.classes = ["LSIL", "HSIL", "SCC", "AGC", "EC", "FUNGI", "TRI", "CC", "ACTINO", "VIRUS"]
 __C.darknet.dartnetlib = os.path.join(curr_path, "models/darknet/libdarknet.so")
 __C.darknet.cfg_file = os.path.join(curr_path, "models/darknet/yolov3-minitest-10-infer.cfg")
-__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-10_final.weights")
+__C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-batch5-20181130.weights")
+# __C.darknet.weights_file = os.path.join(curr_path, "dataset_files/yolov3-minitest-10_final.weights")
 __C.darknet.datacfg_file = os.path.join(curr_path, "models/darknet/minitest-10.data")
 __C.darknet.namecfg_file = os.path.join(curr_path, "models/darknet/minitest-10.names")
 __C.darknet.thresh = 0.1
@@ -52,15 +53,17 @@ __C.darknet.min_overlap_ratio = 0.6
 __C.xception = edict()
 __C.xception.det1 = -0.05  # used in gen_np_array
 __C.xception.size = 299
-__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_60.h5")
+# __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_60.h5")
 # __C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune.h5")
+__C.xception.weights_file = os.path.join(curr_path, "dataset_files/Xception_finetune_batch5_20181130.h5")
 
 # __C.xception.classes = ["ACTINO", "AGC", "ASCH", "ASCUS", "CC", "EC", "FUNGI",
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
 
-__C.xception.classes = ["ACTINO", "AGC", "CC", "EC", "FUNGI", "GEC", "HSIL_B", "HSIL_M", "HSIL_S", "LSIL_E", "LSIL_F", "MC", "RC", "SC", "SCC_G", "SCC_R", "TRI", "VIRUS"]
+# __C.xception.classes = ["ACTINO", "AGC", "CC", "EC", "FUNGI", "GEC", "HSIL_B", "HSIL_M", "HSIL_S", "LSIL_E", "LSIL_F", "MC", "RC", "SC", "SCC_G", "SCC_R", "TRI", "VIRUS"]
+__C.xception.classes = ["ACTINO", "AGC_A", "AGC_B", "ASCUS", "CC", "EC", "FUNGI", "GEC", "HSIL_B", "HSIL_M", "HSIL_S", "LSIL_E", "LSIL_F", "MC", "RC", "SC", "SCC_G", "SCC_R", "TRI", "VIRUS"]
 
-__C.xception.class_num = 18
+__C.xception.class_num = 20
 
 # __C.xception.classes = ["ACTINO", "ADC", "AGC1", "AGC2", "ASCH", "ASCUS", "CC", "EC", "FUNGI", 
 #                         "GEC", "HSIL", "LSIL", "MC", "RC", "SC", "SCC", "TRI", "VIRUS"]
