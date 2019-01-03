@@ -8,11 +8,12 @@ sys.path.append('..')
 from common.tslide.tslide import TSlide
 from utils import generate_name_path_dict, FilesScanner
 
-TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/HENAN_FULL_TEST/TIFFS/'
+TIFF_FILES_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/normals/'
 
 LOCAL_TIFF_PATH = '/home/cnn/Development/DATA/TRAIN_DATA/TIFFS'
-REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF"
-
+# REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/0TIFF/"
+REMOTE_TIFF_PATH = "/mnt/samba/0TIFF/NFYY_HY/normal/"
+# REMOTE_TIFF_PATH = "/run/user/1000/gvfs/smb-share:server=192.168.2.221,share=data_samba/DATA/5TEST/GOLD_TEST/"
 
 def tiff_readable_check(path):
     """
@@ -48,7 +49,8 @@ def get_and_download(file_path):
     tiff_dict = generate_name_path_dict(TIFF_FILES_PATH, ['.kfb', '.tif'])
     local_tiff_dict = generate_name_path_dict(LOCAL_TIFF_PATH, ['.kfb', '.tif'])
     remote_tiff_dict = generate_name_path_dict(REMOTE_TIFF_PATH, ['.kfb', '.tif'])
-
+    
+    print(remote_tiff_dict)
     with open(file_path) as f:
         lines = f.readlines()
         items = [line.replace('\n', '').replace(' ', '-') for line in lines]
@@ -61,8 +63,8 @@ def get_and_download(file_path):
         if item not in tiff_dict:
             if item in local_tiff_dict:
                 remote_file_path = local_tiff_dict[item]
-                print("MOVE FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
-                shutil.move(remote_file_path, TIFF_FILES_PATH)
+                print("COPY FILE ...\nFROM %s\nTO %s" % (remote_file_path, TIFF_FILES_PATH))
+                shutil.copy(remote_file_path, TIFF_FILES_PATH)
             else:
                 try:
                     remote_file_path = remote_tiff_dict[item]
@@ -99,6 +101,6 @@ def collect_useful_tiff_by_txt(path):
 if __name__ == '__main__':
     # 检查文件名是否有重复
     # tiff_readable_check(REMOTE_TIFF_PATH)
-    get_and_download('henan_test_slides_89.txt')
+    get_and_download('work_list_normal_108_20181218.txt')
 
     # collect_useful_tiff_by_txt('work_tiff_list_20181109_SELECTED.txt')

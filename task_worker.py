@@ -6,7 +6,11 @@ from multiprocessing.managers import BaseManager
 from utils import generate_name_path_dict
 from lbp_algo_tiff_worker_for_demo import slides_diagnose_worker
 
+<<<<<<< HEAD
 SLIDE_STORAGE_PATH = "/home/cnn/Development/DATA/TRAIN_DATA/TIFFS/201811132110_FULL_TEST/TIFFS_ALL/"
+=======
+SLIDE_STORAGE_PATH = "/home/stimage/Development/DATA/PRODUCTION_FULL_TEST/TIFFS/"
+>>>>>>> 5ffa7a34c2ada7ddeaf0751827ae32aea5742a6f
 
 
 # 创建类似的QueueManager:
